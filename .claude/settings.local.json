@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:regenaglab.com)"
+      "WebFetch(domain:regenaglab.com)",
+      "Bash(streamlit run:*)"
     ],
     "deny": [],
     "ask": []
