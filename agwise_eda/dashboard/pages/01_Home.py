@@ -14,7 +14,7 @@ st.set_page_config(
     page_title="Haney Soil Health Dashboard - Home",
     page_icon="🌱",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # Custom CSS - Regen Ag Lab Brand Styling
@@ -239,7 +239,174 @@ st.markdown("""
         color: #3a3a3a;
         text-decoration: underline;
     }
+
+    /* Hide sidebar completely since we're using top navigation */
+    [data-testid="stSidebar"] {
+        display: none !important;
+    }
+
+    button[kind="header"] {
+        display: none !important;
+    }
+
+    /* Hide Streamlit's default header */
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+
+    .stApp > header {
+        display: none !important;
+    }
+
+    .main {
+        margin-left: 0 !important;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+        background-color: #ffffff;
+        border-bottom: 3px solid #e40032;
+        padding: 0;
+        margin: 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 999;
+        font-family: 'Raleway', sans-serif;
+    }
+
+    /* Add padding to main content to account for fixed navbar */
+    .block-container {
+        padding-top: 80px !important;
+    }
+
+    .nav-container {
+        max-width: 1240px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+    }
+
+    .nav-logo {
+        font-size: 24px;
+        font-weight: 600;
+        color: #e40032;
+        padding: 15px 20px 15px 0;
+        text-decoration: none;
+    }
+
+    .nav-menu {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        flex-grow: 1;
+    }
+
+    .nav-item {
+        position: relative;
+    }
+
+    .nav-link {
+        display: block;
+        padding: 18px 20px;
+        color: #53575a !important;
+        text-decoration: none !important;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .nav-link:visited {
+        color: #53575a !important;
+        text-decoration: none !important;
+    }
+
+    .nav-link:hover {
+        background-color: #f5f5f5;
+        color: #e40032 !important;
+        text-decoration: none !important;
+    }
+
+    .nav-link.active {
+        background-color: #e40032;
+        color: #ffffff !important;
+    }
+
+    /* Dropdown menu */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #ffffff;
+        min-width: 250px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        z-index: 1000;
+        border: 1px solid #eaeaea;
+        border-top: 3px solid #e40032;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    .dropdown-content a {
+        color: #53575a;
+        padding: 12px 20px;
+        text-decoration: none;
+        display: block;
+        font-size: 15px;
+        font-weight: 400;
+        transition: all 0.2s ease;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #f5f5f5;
+        color: #e40032;
+        padding-left: 25px;
+    }
+
+    .dropdown-arrow {
+        font-size: 12px;
+        margin-left: 5px;
+    }
 </style>
+""", unsafe_allow_html=True)
+
+# Navigation Bar
+st.markdown("""
+<div class="top-nav">
+    <div class="nav-container">
+        <div class="nav-logo">Haney Soil AI</div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="Home" target="_parent" class="nav-link active">Home</a></li>
+            <li class="nav-item dropdown">
+                <span class="nav-link">Analysis <span class="dropdown-arrow">▼</span></span>
+                <div class="dropdown-content">
+                    <a href="../" target="_parent">📈 Overview & Statistics</a>
+                    <a href="../?view=soil_health" target="_parent">🔬 Soil Health Analysis</a>
+                    <a href="../?view=cover_crop" target="_parent">🌾 Cover Crop Analysis</a>
+                    <a href="../?view=economic" target="_parent">💰 Economic Analysis</a>
+                    <a href="../?view=correlation" target="_parent">🔗 Correlation Explorer</a>
+                    <a href="../?view=custom" target="_parent">📊 Custom Analysis</a>
+                    <a href="../?view=dictionary" target="_parent">📚 Data Dictionary</a>
+                    <a href="../?view=deliverables" target="_parent">📦 Project Deliverables</a>
+                </div>
+            </li>
+            <li class="nav-item"><a href="Economic_Analysis" target="_parent" class="nav-link">Economic Analysis</a></li>
+            <li class="nav-item"><a href="../?view=feedback" target="_parent" class="nav-link">Feedback</a></li>
+        </ul>
+    </div>
+</div>
 """, unsafe_allow_html=True)
 
 # Load logo and paths
