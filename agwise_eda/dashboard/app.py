@@ -15,6 +15,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from pathlib import Path
 from PIL import Image
+from streamlit_option_menu import option_menu
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -30,7 +31,7 @@ st.set_page_config(
     page_title="Haney Soil Health Analysis Dashboard",
     page_icon="🌱",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"  # Collapse sidebar since we're using top nav
 )
 
 # Custom CSS - Regen Ag Lab Brand Styling
@@ -59,6 +60,30 @@ st.markdown("""
 
     .main .block-container {
         background-color: #f5f5f5 !important;
+    }
+
+    /* Hide sidebar completely since we're using top navigation */
+    [data-testid="stSidebar"] {
+        display: none !important;
+    }
+
+    /* Hide sidebar toggle button */
+    button[kind="header"] {
+        display: none !important;
+    }
+
+    /* Hide Streamlit's default header */
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+
+    .stApp > header {
+        display: none !important;
+    }
+
+    /* Adjust main content area to use full width */
+    .main {
+        margin-left: 0 !important;
     }
 
     html, body, [class*="css"], .stMarkdown {
@@ -488,17 +513,175 @@ except Exception as e:
     data_loaded = False
 
 if data_loaded:
+    # Top Navigation Bar with Dropdown - Must be at the very top
+    st.markdown("""
+    <style>
+        /* Custom top navigation bar */
+        .top-nav {
+            background-color: #ffffff;
+            border-bottom: 3px solid #e40032;
+            padding: 0;
+            margin: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 999;
+            font-family: 'Raleway', sans-serif;
+        }
+
+        /* Add padding to main content to account for fixed navbar */
+        .block-container {
+            padding-top: 80px !important;
+        }
+
+        .nav-container {
+            max-width: 1240px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-logo {
+            font-size: 24px;
+            font-weight: 600;
+            color: #e40032;
+            padding: 15px 20px 15px 0;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 18px 20px;
+            color: #53575a !important;
+            text-decoration: none !important;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-link:visited {
+            color: #53575a !important;
+            text-decoration: none !important;
+        }
+
+        .nav-link:hover {
+            background-color: #f5f5f5;
+            color: #e40032 !important;
+            text-decoration: none !important;
+        }
+
+        .nav-link.active {
+            background-color: #e40032;
+            color: #ffffff !important;
+        }
+
+        /* Dropdown menu */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            min-width: 250px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            z-index: 1000;
+            border: 1px solid #eaeaea;
+            border-top: 3px solid #e40032;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a {
+            color: #53575a;
+            padding: 12px 20px;
+            text-decoration: none;
+            display: block;
+            font-size: 15px;
+            font-weight: 400;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f5f5f5;
+            color: #e40032;
+            padding-left: 25px;
+        }
+
+        .dropdown-arrow {
+            font-size: 12px;
+            margin-left: 5px;
+        }
+    </style>
+
+    <div class="top-nav">
+        <div class="nav-container">
+            <div class="nav-logo">Haney Soil AI</div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="Home" target="_parent" class="nav-link">Home</a></li>
+                <li class="nav-item dropdown">
+                    <span class="nav-link">Analysis <span class="dropdown-arrow">▼</span></span>
+                    <div class="dropdown-content">
+                        <a href="?view=overview" target="_parent">📈 Overview & Statistics</a>
+                        <a href="?view=soil_health" target="_parent">🔬 Soil Health Analysis</a>
+                        <a href="?view=cover_crop" target="_parent">🌾 Cover Crop Analysis</a>
+                        <a href="?view=economic" target="_parent">💰 Economic Analysis</a>
+                        <a href="?view=correlation" target="_parent">🔗 Correlation Explorer</a>
+                        <a href="?view=custom" target="_parent">📊 Custom Analysis</a>
+                        <a href="?view=dictionary" target="_parent">📚 Data Dictionary</a>
+                        <a href="?view=deliverables" target="_parent">📦 Project Deliverables</a>
+                    </div>
+                </li>
+                <li class="nav-item"><a href="Economic_Analysis" target="_parent" class="nav-link">Economic Analysis</a></li>
+                <li class="nav-item"><a href="?view=feedback" target="_parent" class="nav-link">Feedback</a></li>
+            </ul>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Get query parameters for view selection
+    query_params = st.query_params
+    view = query_params.get("view", "overview")
+
+    # Map view to page name
+    view_mapping = {
+        "overview": "📈 Overview & Statistics",
+        "soil_health": "🔬 Soil Health Analysis",
+        "cover_crop": "🌾 Cover Crop Analysis",
+        "economic": "💰 Economic Analysis",
+        "correlation": "🔗 Correlation Explorer",
+        "custom": "📊 Custom Analysis",
+        "dictionary": "📚 Data Dictionary",
+        "deliverables": "📦 Project Deliverables",
+        "feedback": "💬 Feedback"
+    }
+
+    page = view_mapping.get(view, "📈 Overview & Statistics")
+
     # Header - Regen Ag Lab brand styling
     st.markdown("""
-    <div style="text-align: center; padding: 2rem 1rem 1rem 1rem;">
-        <h1 style="color: #e40032; margin: 0; font-size: 36px; font-weight: 600; font-family: 'Raleway', sans-serif;">
-            Haney Soil AI
-        </h1>
-        <p style="color: #53575a; margin: 0.5rem 0 0 0; font-size: 17px; font-family: 'Raleway', sans-serif;">
-            Measuring Soil as a Living System
-        </p>
-    </div>
-    <div style="text-align: center; padding: 1rem 0;">
+    <div style="text-align: center; padding: 1rem 1rem 1rem 1rem;">
         <h2 style="color: #53575a; margin: 0; font-size: 30px; font-weight: 600; font-family: 'Raleway', sans-serif;">
             Agricultural Soil Health Analysis Dashboard
         </h2>
@@ -518,81 +701,72 @@ if data_loaded:
     </div>
     """, unsafe_allow_html=True)
 
-    # Sidebar
-    st.sidebar.title("📊 Dashboard Controls")
-    st.sidebar.markdown("---")
+    # Handle feedback page separately
+    if page == "💬 Feedback":
+        st.markdown('<h2 class="section-header">💬 Submit Feedback</h2>', unsafe_allow_html=True)
 
-    # Page selection
-    page = st.sidebar.radio(
-        "Select Analysis View:",
-        ["📈 Overview & Statistics",
-         "🔬 Soil Health Analysis",
-         "🌾 Cover Crop Analysis",
-         "💰 Economic Analysis",
-         "🔗 Correlation Explorer",
-         "📊 Custom Analysis",
-         "📚 Data Dictionary",
-         "📦 Project Deliverables"]
-    )
-
-    st.sidebar.markdown("---")
-    st.sidebar.info(f"""
-    **About the Haney Soil Health Test**
-
-    This dashboard analyzes {len(data):,} soil samples using the Haney Test methodology developed by Dr. Rick Haney at Regen Ag Lab.
-
-    **What Makes It Different:**
-    - Measures soil as a **living system** (CO2-C respiration)
-    - Uses H3A extractant that mimics plant root exudates
-    - Integrates biology + chemistry for accurate nutrient availability
-    - Supports reduced synthetic fertilizer inputs
-    """)
-
-    # Feedback Section
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 💬 Feedback")
-
-    with st.sidebar.expander("📝 Submit Feedback", expanded=False):
         st.markdown("""
-        <div class="feedback-box">
-        Have a question, comment, or concern? Let us know!
+        <div class="info-box">
+        <b>We'd Love to Hear From You!</b><br>
+        Have a question, comment, bug report, or feature request? Please share your feedback below.
         </div>
         """, unsafe_allow_html=True)
 
-        feedback_type = st.selectbox(
-            "Type:",
-            ["Question", "Comment", "Bug Report", "Feature Request", "Data Issue", "Other"],
-            key="feedback_type"
-        )
+        col1, col2 = st.columns([2, 1])
 
-        feedback_message = st.text_area(
-            "Message:",
-            placeholder="Describe your feedback here...",
-            height=100,
-            key="feedback_message"
-        )
+        with col1:
+            feedback_type = st.selectbox(
+                "Feedback Type:",
+                ["Question", "Comment", "Bug Report", "Feature Request", "Data Issue", "Other"],
+                key="feedback_type"
+            )
 
-        uploaded_file = st.file_uploader(
-            "Attach file (optional):",
-            type=['png', 'jpg', 'jpeg', 'pdf', 'csv', 'xlsx', 'txt', 'docx'],
-            key="feedback_file"
-        )
+            feedback_message = st.text_area(
+                "Your Message:",
+                placeholder="Describe your feedback here...",
+                height=200,
+                key="feedback_message"
+            )
 
-        if st.button("📤 Submit Feedback", key="submit_feedback"):
-            if feedback_message.strip():
-                try:
-                    save_feedback(
-                        page=page,
-                        feedback_type=feedback_type,
-                        message=feedback_message,
-                        uploaded_file=uploaded_file
-                    )
-                    st.success("✅ Feedback submitted successfully! Thank you!")
-                    st.balloons()
-                except Exception as e:
-                    st.error(f"❌ Error submitting feedback: {e}")
-            else:
-                st.warning("⚠️ Please enter a message before submitting.")
+            uploaded_file = st.file_uploader(
+                "Attach a file (optional):",
+                type=['png', 'jpg', 'jpeg', 'pdf', 'csv', 'xlsx', 'txt', 'docx'],
+                key="feedback_file"
+            )
+
+            if st.button("📤 Submit Feedback", key="submit_feedback", type="primary"):
+                if feedback_message.strip():
+                    try:
+                        save_feedback(
+                            page="Feedback Page",
+                            feedback_type=feedback_type,
+                            message=feedback_message,
+                            uploaded_file=uploaded_file
+                        )
+                        st.success("✅ Feedback submitted successfully! Thank you!")
+                        st.balloons()
+                    except Exception as e:
+                        st.error(f"❌ Error submitting feedback: {e}")
+                else:
+                    st.warning("⚠️ Please enter a message before submitting.")
+
+        with col2:
+            st.markdown("""
+            <div class="info-box">
+            <h4 style="color: #e40032; margin-top: 0;">About the Haney Soil Health Test</h4>
+            <p>This dashboard analyzes soil samples using the Haney Test methodology developed by Dr. Rick Haney at Regen Ag Lab.</p>
+            <p><b>What Makes It Different:</b></p>
+            <ul style="margin: 0; padding-left: 20px;">
+                <li>Measures soil as a <b>living system</b> (CO2-C respiration)</li>
+                <li>Uses H3A extractant that mimics plant root exudates</li>
+                <li>Integrates biology + chemistry for accurate nutrient availability</li>
+                <li>Supports reduced synthetic fertilizer inputs</li>
+            </ul>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Stop here - don't render other pages
+        st.stop()
 
     # ==================================================================
     # PAGE 1: OVERVIEW & STATISTICS
