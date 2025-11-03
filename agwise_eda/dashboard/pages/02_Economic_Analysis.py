@@ -1,8 +1,9 @@
 """
 Economic Analysis: Haney vs Traditional Soil Testing
-Interactive What-If Simulation Tool
+Interactive What-If Simulation Tool powered by Regen Ag Lab data
 
-Robust economic model for agronomic decision-making
+Robust economic model for agronomic decision-making based on
+the Haney Soil Health Test methodology
 """
 
 import streamlit as st
@@ -15,38 +16,161 @@ from pathlib import Path
 
 st.set_page_config(page_title="Economic Analysis", page_icon="💰", layout="wide")
 
-# Custom CSS
+# Custom CSS - Regen Ag Lab Brand Styling
 st.markdown("""
 <style>
+    /* Import Raleway font */
+    @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap');
+
+    /* CSS Variables matching Regen Ag Lab brand */
+    :root {
+        --color-primary: #e40032;
+        --color-dark: #53575a;
+        --color-light-bg: #f5f5f5;
+        --color-white: #ffffff;
+        --font-family: 'Raleway', sans-serif;
+        --border-radius: 5px;
+    }
+
+    /* Override Streamlit defaults */
+    .stApp {
+        background-color: #f5f5f5 !important;
+    }
+
+    .main .block-container {
+        background-color: #f5f5f5 !important;
+    }
+
+    html, body, [class*="css"], .stMarkdown {
+        font-family: 'Raleway', sans-serif !important;
+        font-size: 17px;
+        line-height: 1.7;
+        color: #53575a;
+    }
+
+    /* Headings */
+    h1, h2, h3, h4 {
+        font-family: 'Raleway', sans-serif !important;
+        font-weight: 600 !important;
+        color: #53575a !important;
+    }
+
+    h1 { font-size: 48px !important; }
+    h2 { font-size: 42px !important; }
+    h3 { font-size: 30px !important; }
+    h4 { font-size: 20px !important; }
+
+    /* Equation box */
     .equation-box {
-        background-color: #f8f9fa;
-        padding: 1.5rem;
-        border-radius: 0.5rem;
-        border-left: 4px solid #2c5f2d;
-        margin: 1rem 0;
+        background-color: #ffffff;
+        padding: 25px 30px;
+        border-radius: 5px;
+        border-left: 5px solid #e40032;
+        margin: 1.5rem 0;
         font-family: 'Courier New', monospace;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
+
+    /* Assumption header */
     .assumption-header {
-        background-color: #e8f5e9;
-        padding: 0.5rem;
-        border-radius: 0.3rem;
-        font-weight: bold;
+        background-color: #ffffff;
+        padding: 15px 20px;
+        border-radius: 5px;
+        font-weight: 600;
         margin-top: 1rem;
+        border: 1px solid #eaeaea;
+        color: #53575a;
+        font-family: 'Raleway', sans-serif;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
+
+    /* Metrics */
     .metric-positive {
         color: #2e7d32;
-        font-weight: bold;
+        font-weight: 600;
+        font-family: 'Raleway', sans-serif;
     }
+
     .metric-negative {
         color: #c62828;
-        font-weight: bold;
+        font-weight: 600;
+        font-family: 'Raleway', sans-serif;
+    }
+
+    /* Info boxes */
+    .info-box {
+        background-color: #ffffff;
+        padding: 25px 30px;
+        border-radius: 5px;
+        border-left: 5px solid #e40032;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        font-family: 'Raleway', sans-serif;
+        color: #53575a;
+    }
+
+    /* Streamlit metric styling */
+    [data-testid="stMetricValue"] {
+        color: #53575a !important;
+        font-family: 'Raleway', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 32px !important;
+    }
+
+    [data-testid="stMetricLabel"] {
+        color: #53575a !important;
+        font-family: 'Raleway', sans-serif !important;
+        font-size: 15px !important;
+    }
+
+    /* Links */
+    a {
+        color: #e40032;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    a:hover {
+        color: #3a3a3a;
+        text-decoration: underline;
+    }
+
+    /* Section headers */
+    .section-header {
+        color: #e40032 !important;
+        font-family: 'Raleway', sans-serif !important;
+        font-weight: 600 !important;
+        border-bottom: 3px solid #e40032;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Header
-st.markdown("<h1 style='color: #2c5f2d;'>💰 Economic Analysis: Soil Testing ROI</h1>", unsafe_allow_html=True)
+# Header - Regen Ag Lab brand styling
+st.markdown("""
+<div style="text-align: center; padding: 2rem 1rem 1rem 1rem;">
+    <h1 style="color: #e40032; margin: 0; font-size: 48px; font-weight: 600; font-family: 'Raleway', sans-serif;">
+        Haney Soil AI
+    </h1>
+    <p style="color: #53575a; margin: 0.5rem 0 0 0; font-size: 17px; font-family: 'Raleway', sans-serif;">
+        Economic Analysis & ROI Calculator
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown('<h2 class="section-header">💰 Economic Analysis: Soil Testing ROI</h2>', unsafe_allow_html=True)
 st.markdown("### Interactive What-If Simulation for Haney vs Traditional Testing")
+
+st.markdown("""
+<div class="info-box">
+<b>About the Haney Test Economic Advantage:</b> The Haney Soil Health Test methodology provides more accurate
+plant-available nutrient measurements by measuring soil as a living system. This analysis demonstrates the economic
+value of reduced synthetic fertilizer inputs based on biological nutrient availability data.
+<br><br>
+<b>Data powered by Regen Ag Lab</b> - Developed by Dr. Rick Haney, Chief Scientific Officer
+</div>
+""", unsafe_allow_html=True)
 
 # Load data
 @st.cache_data
@@ -715,11 +839,48 @@ st.download_button(
     mime="text/csv"
 )
 
-st.markdown("---")
-st.markdown("""
-<div style='text-align: center; color: #666; padding: 2rem;'>
-    <p><strong>Economic Analysis Tool v1.0</strong></p>
-    <p>Model assumptions based on agronomic research and industry standards.</p>
-    <p>For specific recommendations, consult with a certified crop advisor or agronomist.</p>
+# Footer with Regen Ag Lab branding
+st.markdown("<hr style='border: none; height: 1px; background-color: #dddddd; margin: 30px 0;'>", unsafe_allow_html=True)
+
+# Convert logo to base64 for embedding
+import base64
+from pathlib import Path
+
+LOGO_PATH = Path(__file__).parent.parent / 'assets' / 'regen_ag_lab_logo.png'
+
+try:
+    with open(LOGO_PATH, "rb") as img_file:
+        logo_base64 = base64.b64encode(img_file.read()).decode()
+    logo_html = f'<img src="data:image/png;base64,{logo_base64}" style="width: 150px; height: auto;" alt="Regen Ag Lab Logo">'
+except:
+    logo_html = ""
+
+# Footer with embedded logo
+st.markdown(f"""
+<div style="background-color: #ffffff; border-top: 4px solid #e40032; padding: 40px 20px; margin-top: 40px;">
+    <div style="display: grid; grid-template-columns: 180px 1fr 180px; gap: 30px; max-width: 1240px; margin: 0 auto; align-items: start;">
+        <div style="text-align: left;">
+            {logo_html}
+        </div>
+        <div style="text-align: center;">
+            <h3 style="color: #53575a; margin-top: 0; font-family: 'Raleway', sans-serif; font-size: 30px; font-weight: 600;">
+                Powered by Regen Ag Lab
+            </h3>
+            <p style="margin: 15px 0; color: #53575a; font-family: 'Raleway', sans-serif; font-size: 17px;">
+                <strong>Dr. Rick Haney, Chief Scientific Officer</strong><br>
+                Measuring soil as a living system
+            </p>
+            <p style="margin: 15px 0; font-size: 17px; color: #53575a; font-family: 'Raleway', sans-serif;">
+                Visit <a href="https://regenaglab.com/" target="_blank" style="color: #e40032; text-decoration: none; font-weight: 400;">regenaglab.com</a> to learn more about our
+                comprehensive soil testing services and regenerative agriculture solutions.
+            </p>
+            <p style="margin: 20px 0 0 0; font-size: 14px; color: #888; font-family: 'Raleway', sans-serif;">
+                <em>Economic Analysis Tool v1.0 | Model assumptions based on agronomic research and industry standards.<br>
+                For specific recommendations, consult with a certified crop advisor or agronomist.</em>
+            </p>
+        </div>
+        <div style="text-align: right;">
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)

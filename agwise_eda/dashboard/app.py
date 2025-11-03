@@ -1,8 +1,9 @@
 """
 Interactive Agricultural Soil Health EDA Dashboard
+Data analysis powered by the Haney Soil Health Test methodology
 Built with Streamlit and Plotly (open-source packages)
 
-Author: Claude Code
+Developed in partnership with Regen Ag Lab
 Date: October 6, 2025
 """
 
@@ -13,6 +14,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from pathlib import Path
+from PIL import Image
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -25,47 +27,332 @@ except ImportError:
 
 # Page configuration
 st.set_page_config(
-    page_title="Soil Health EDA Dashboard",
+    page_title="Haney Soil Health Analysis Dashboard",
     page_icon="🌱",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
+# Custom CSS - Regen Ag Lab Brand Styling
 st.markdown("""
 <style>
+    /* Import Raleway font */
+    @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap');
+
+    /* CSS Variables matching Regen Ag Lab brand */
+    :root {
+        --color-primary: #e40032;
+        --color-dark: #53575a;
+        --color-light-bg: #f5f5f5;
+        --color-white: #ffffff;
+        --color-green: #81d742;
+        --color-border-light: #dddddd;
+        --color-border-medium: #eaeaea;
+        --font-family: 'Raleway', sans-serif;
+        --border-radius: 5px;
+    }
+
+    /* Override Streamlit defaults - background and fonts */
+    .stApp {
+        background-color: #f5f5f5 !important;
+    }
+
+    .main .block-container {
+        background-color: #f5f5f5 !important;
+    }
+
+    html, body, [class*="css"], .stMarkdown {
+        font-family: 'Raleway', sans-serif !important;
+        font-size: 17px;
+        line-height: 1.7;
+        color: #53575a;
+    }
+
+    /* Headings */
+    h1, h2, h3, h4 {
+        font-family: 'Raleway', sans-serif !important;
+        font-weight: 600 !important;
+        color: #53575a !important;
+    }
+
+    h1 { font-size: 48px !important; }
+    h2 { font-size: 42px !important; }
+    h3 { font-size: 30px !important; }
+    h4 { font-size: 20px !important; }
+
+    /* Main header */
     .main-header {
-        font-size: 2.5rem;
-        color: #2c5f2d;
-        font-weight: bold;
+        font-size: 36px;
+        color: #e40032;
+        font-weight: 600;
         text-align: center;
-        padding: 1rem;
+        padding: 1rem 0;
+        font-family: 'Raleway', sans-serif;
     }
-    .metric-card {
-        background-color: #f0f2f6;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border-left: 4px solid #2c5f2d;
+
+    /* Metric cards - Regen brand style */
+    .regen-metric {
+        background-color: #ffffff;
+        padding: 25px 20px;
+        border-radius: 5px;
+        border: 2px solid #eaeaea;
+        text-align: center;
+        transition: all 0.3s ease;
     }
+
+    .regen-metric:hover {
+        border-color: #e40032;
+    }
+
+    .regen-metric-value {
+        font-size: 42px;
+        font-weight: 600;
+        color: #e40032;
+        margin: 0;
+        font-family: 'Raleway', sans-serif;
+        line-height: 1.2;
+    }
+
+    .regen-metric-label {
+        font-size: 17px;
+        font-weight: 400;
+        color: #53575a;
+        margin: 10px 0 0 0;
+        font-family: 'Raleway', sans-serif;
+    }
+
+    /* Info box */
     .info-box {
-        background-color: #e8f5e9;
-        padding: 1rem;
-        border-radius: 0.5rem;
+        background-color: #ffffff;
+        padding: 20px 25px;
+        border-radius: 5px;
+        border: 1px solid #eaeaea;
         margin: 1rem 0;
+        color: #53575a;
+        font-family: 'Raleway', sans-serif;
+        font-size: 17px;
     }
+
+    /* Feedback box */
     .feedback-box {
-        background-color: #fff3e0;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border-left: 4px solid #ff9800;
+        background-color: #ffffff;
+        padding: 20px 25px;
+        border-radius: 5px;
+        border-left: 4px solid #e40032;
         margin: 1rem 0;
+        color: #53575a;
+        font-family: 'Raleway', sans-serif;
+    }
+
+    /* Service Cards */
+    .regen-card {
+        background-color: #ffffff;
+        padding: 30px 25px;
+        border-radius: 5px;
+        border: 1px solid #eaeaea;
+        text-align: center;
+        height: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .regen-card:hover {
+        border-color: #e40032;
+        box-shadow: 0 4px 8px rgba(228, 0, 50, 0.15);
+        transform: translateY(-3px);
+    }
+
+    /* Buttons */
+    .regen-button {
+        background-color: #53575a;
+        color: #ffffff !important;
+        font-family: 'Raleway', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 16px 35px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        text-decoration: none !important;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .regen-button:hover {
+        background-color: #e40032;
+        color: #ffffff !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Links */
+    a {
+        color: #e40032;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    a:hover {
+        color: #3a3a3a;
+        text-decoration: underline;
+    }
+
+    /* Table styling with gradient header matching Regen Ag Lab */
+    .dataframe {
+        font-family: 'Raleway', sans-serif !important;
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    .dataframe thead tr {
+        background: linear-gradient(to right, #eb4065, #e40032) !important;
+    }
+
+    .dataframe thead th {
+        color: #ffffff !important;
+        font-size: 18px !important;
+        font-weight: 700 !important;
+        padding: 15px !important;
+        text-align: center !important;
+        border: 1px solid #e40032 !important;
+        font-family: 'Raleway', sans-serif !important;
+    }
+
+    .dataframe tbody td {
+        background: #EEEEEE !important;
+        border: 1px solid #AAAAAA !important;
+        padding: 10px 15px !important;
+        text-align: center !important;
+        font-size: 17px !important;
+        font-weight: 400 !important;
+        color: #53575a !important;
+        line-height: 1.5 !important;
+        font-family: 'Raleway', sans-serif !important;
+    }
+
+    .dataframe tbody tr:nth-child(even) td {
+        background: #ffffff !important;
+    }
+
+    /* Streamlit table styling - multiple selectors for compatibility */
+    table, [data-testid="stTable"] table, .stDataFrame table {
+        font-family: 'Raleway', sans-serif !important;
+        border-collapse: collapse !important;
+    }
+
+    thead, [data-testid="stTable"] thead, .stDataFrame thead {
+        background: linear-gradient(to right, #eb4065, #e40032) !important;
+    }
+
+    th, [data-testid="stTable"] th, .stDataFrame th {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        font-size: 18px !important;
+        padding: 15px !important;
+        border: 1px solid #e40032 !important;
+        background: linear-gradient(to right, #eb4065, #e40032) !important;
+    }
+
+    td, [data-testid="stTable"] td, .stDataFrame td {
+        background: #EEEEEE !important;
+        border: 1px solid #AAAAAA !important;
+        padding: 10px 15px !important;
+        text-align: center !important;
+        font-size: 17px !important;
+        font-weight: 400 !important;
+        color: #53575a !important;
+        font-family: 'Raleway', sans-serif !important;
+    }
+
+    tr:nth-child(even) td {
+        background: #ffffff !important;
+    }
+
+    /* Streamlit dataframe container styling */
+    [data-testid="stDataFrame"] {
+        font-family: 'Raleway', sans-serif !important;
+    }
+
+    [data-testid="stDataFrame"] th {
+        background: linear-gradient(to right, #eb4065, #e40032) !important;
+        color: #ffffff !important;
+    }
+
+    /* Section headers with red accent */
+    .section-header {
+        color: #e40032 !important;
+        font-family: 'Raleway', sans-serif !important;
+        font-weight: 600 !important;
+        border-bottom: 3px solid #e40032;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    /* Divider with red accent */
+    .regen-divider {
+        height: 2px;
+        background: linear-gradient(to right, transparent, #e40032, transparent);
+        border: none;
+        margin: 30px 0;
+    }
+
+    /* Streamlit metric styling - use dark gray for positive association */
+    [data-testid="stMetricValue"] {
+        color: #53575a !important;
+        font-family: 'Raleway', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 32px !important;
+    }
+
+    [data-testid="stMetricLabel"] {
+        color: #53575a !important;
+        font-family: 'Raleway', sans-serif !important;
+        font-size: 15px !important;
+    }
+
+    /* Streamlit headers */
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
+        color: #53575a !important;
+    }
+
+    /* Plotly chart backgrounds and styling */
+    .js-plotly-plot .plotly {
+        background-color: #f5f5f5 !important;
+    }
+
+    .js-plotly-plot .plotly .bg {
+        fill: #f5f5f5 !important;
+    }
+
+    .js-plotly-plot .plotly .gridlayer .grid {
+        stroke: #dddddd !important;
+    }
+
+    /* Plotly text colors */
+    .js-plotly-plot .plotly text {
+        fill: #53575a !important;
+        font-family: 'Raleway', sans-serif !important;
+    }
+
+    .js-plotly-plot .plotly .xtick text,
+    .js-plotly-plot .plotly .ytick text {
+        fill: #53575a !important;
+    }
+
+    .js-plotly-plot .plotly .g-gtitle text,
+    .js-plotly-plot .plotly .g-xtitle text,
+    .js-plotly-plot .plotly .g-ytitle text {
+        fill: #53575a !important;
+        font-weight: 600 !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
+DASHBOARD_DIR = Path(__file__).resolve().parent
 DATA_FILE = BASE_DIR / 'data' / 'processed' / 'combined_soil_data_FULL.csv'
+LOGO_PATH = DASHBOARD_DIR / 'assets' / 'regen_ag_lab_logo.png'
 FEEDBACK_DIR = BASE_DIR / 'feedback'
 FEEDBACK_FILE = FEEDBACK_DIR / 'user_feedback.csv'
 FEEDBACK_UPLOADS = FEEDBACK_DIR / 'uploads'
@@ -73,6 +360,79 @@ FEEDBACK_UPLOADS = FEEDBACK_DIR / 'uploads'
 # Ensure feedback directories exist
 FEEDBACK_DIR.mkdir(parents=True, exist_ok=True)
 FEEDBACK_UPLOADS.mkdir(parents=True, exist_ok=True)
+
+# Set default Plotly template for light gray backgrounds
+import plotly.io as pio
+
+# Create custom Regen Ag Lab template
+regen_template = go.layout.Template()
+regen_template.layout = go.Layout(
+    plot_bgcolor='#f5f5f5',
+    paper_bgcolor='#f5f5f5',
+    font=dict(
+        family='Raleway, sans-serif',
+        size=14,
+        color='#53575a'
+    ),
+    title_font=dict(
+        family='Raleway, sans-serif',
+        size=18,
+        color='#53575a'
+    ),
+    xaxis=dict(
+        gridcolor='#dddddd',
+        tickfont=dict(color='#53575a', family='Raleway, sans-serif'),
+        title=dict(font=dict(color='#53575a', size=15, family='Raleway, sans-serif')),
+        linecolor='#dddddd',
+        zerolinecolor='#dddddd'
+    ),
+    yaxis=dict(
+        gridcolor='#dddddd',
+        tickfont=dict(color='#53575a', family='Raleway, sans-serif'),
+        title=dict(font=dict(color='#53575a', size=15, family='Raleway, sans-serif')),
+        linecolor='#dddddd',
+        zerolinecolor='#dddddd'
+    ),
+    colorway=['#e40032', '#53575a', '#81d742', '#eb4065', '#464646']
+)
+
+# Register and set as default
+pio.templates['regen'] = regen_template
+pio.templates.default = 'regen'
+
+# Custom Plotly layout defaults
+def apply_regen_style(fig):
+    """Apply Regen Ag Lab styling to Plotly figures"""
+    fig.update_layout(
+        template='regen',
+        plot_bgcolor='#f5f5f5',
+        paper_bgcolor='#f5f5f5',
+        font=dict(
+            family='Raleway, sans-serif',
+            size=14,
+            color='#53575a'
+        ),
+        title_font=dict(
+            family='Raleway, sans-serif',
+            size=18,
+            color='#53575a'
+        )
+    )
+    fig.update_xaxes(
+        gridcolor='#dddddd',
+        tickfont=dict(color='#53575a', family='Raleway, sans-serif'),
+        title_font=dict(color='#53575a', size=15, family='Raleway, sans-serif'),
+        linecolor='#dddddd',
+        zerolinecolor='#dddddd'
+    )
+    fig.update_yaxes(
+        gridcolor='#dddddd',
+        tickfont=dict(color='#53575a', family='Raleway, sans-serif'),
+        title_font=dict(color='#53575a', size=15, family='Raleway, sans-serif'),
+        linecolor='#dddddd',
+        zerolinecolor='#dddddd'
+    )
+    return fig
 
 # Cache data loading
 @st.cache_data
@@ -128,9 +488,25 @@ except Exception as e:
     data_loaded = False
 
 if data_loaded:
-    # Header
-    st.markdown('<p class="main-header">🌱 Agricultural Soil Health EDA Dashboard</p>',
-                unsafe_allow_html=True)
+    # Header - Regen Ag Lab brand styling
+    st.markdown("""
+    <div style="text-align: center; padding: 2rem 1rem 1rem 1rem;">
+        <h1 style="color: #e40032; margin: 0; font-size: 36px; font-weight: 600; font-family: 'Raleway', sans-serif;">
+            Haney Soil AI
+        </h1>
+        <p style="color: #53575a; margin: 0.5rem 0 0 0; font-size: 17px; font-family: 'Raleway', sans-serif;">
+            Measuring Soil as a Living System
+        </p>
+    </div>
+    <div style="text-align: center; padding: 1rem 0;">
+        <h2 style="color: #53575a; margin: 0; font-size: 30px; font-weight: 600; font-family: 'Raleway', sans-serif;">
+            Agricultural Soil Health Analysis Dashboard
+        </h2>
+        <p style="color: #53575a; margin: 0.5rem 0 0 0; font-size: 17px; font-family: 'Raleway', sans-serif;">
+            Powered by the Haney Soil Health Test Methodology
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
     # Count batches dynamically
     n_batches = data['_source_batch'].nunique() if '_source_batch' in data.columns else 'Unknown'
@@ -138,7 +514,7 @@ if data_loaded:
     st.markdown(f"""
     <div class="info-box">
     <b>Dataset Overview:</b> {len(data):,} samples | {len(data.columns)} variables |
-    {n_batches} batches | Interactive analysis of full soil health dataset
+    {n_batches} batches | Interactive analysis powered by Haney Test data
     </div>
     """, unsafe_allow_html=True)
 
@@ -161,14 +537,15 @@ if data_loaded:
 
     st.sidebar.markdown("---")
     st.sidebar.info(f"""
-    **About This Dashboard**
+    **About the Haney Soil Health Test**
 
-    Interactive exploration of {len(data):,} soil samples from agricultural testing across 4 data batches.
+    This dashboard analyzes {len(data):,} soil samples using the Haney Test methodology developed by Dr. Rick Haney at Regen Ag Lab.
 
-    Built with:
-    - Streamlit (UI)
-    - Plotly (Interactive charts)
-    - Pandas (Data analysis)
+    **What Makes It Different:**
+    - Measures soil as a **living system** (CO2-C respiration)
+    - Uses H3A extractant that mimics plant root exudates
+    - Integrates biology + chemistry for accurate nutrient availability
+    - Supports reduced synthetic fertilizer inputs
     """)
 
     # Feedback Section
@@ -221,7 +598,7 @@ if data_loaded:
     # PAGE 1: OVERVIEW & STATISTICS
     # ==================================================================
     if page == "📈 Overview & Statistics":
-        st.header("📈 Dataset Overview & Key Statistics")
+        st.markdown('<h2 class="section-header">📈 Dataset Overview & Key Statistics</h2>', unsafe_allow_html=True)
 
         # Top metrics
         col1, col2, col3, col4 = st.columns(4)
@@ -246,13 +623,13 @@ if data_loaded:
         st.markdown("---")
 
         # Batch comparison
-        st.subheader("📦 Batch Distribution")
+        st.markdown('<h3 style="color: #e40032; font-family: Raleway, sans-serif; font-weight: 600;">📦 Batch Distribution</h3>', unsafe_allow_html=True)
         if '_source_batch' in data.columns:
             batch_counts = data['_source_batch'].value_counts().sort_index()
 
             fig = go.Figure(data=[
                 go.Bar(x=batch_counts.index, y=batch_counts.values,
-                      marker_color=['#2c5f2d', '#97c93d'])
+                      marker_color='#e40032')
             ])
             fig.update_layout(
                 title="Samples by Batch",
@@ -260,12 +637,13 @@ if data_loaded:
                 yaxis_title="Number of Samples",
                 height=400
             )
+            fig = apply_regen_style(fig)
             st.plotly_chart(fig, use_container_width=True)
 
         st.markdown("---")
 
         # Geographic Distribution
-        st.subheader("🗺️ Geographic Distribution of Samples")
+        st.markdown('<h3 style="color: #e40032; font-family: Raleway, sans-serif; font-weight: 600;">🗺️ Geographic Distribution of Samples</h3>', unsafe_allow_html=True)
 
         if 'Zip' in data.columns:
             zip_data = data['Zip'].dropna()
@@ -387,7 +765,23 @@ if data_loaded:
                             st.subheader("📍 Top 10 Sample Locations")
                             top_10 = geo_data.nlargest(10, 'count')[['zip', 'city', 'state', 'count']]
                             top_10.columns = ['ZIP Code', 'City', 'State', 'Sample Count']
-                            st.dataframe(top_10.reset_index(drop=True), use_container_width=True, hide_index=True)
+
+                            # Create HTML table with Regen Ag Lab styling
+                            html_table = '<table class="regen-table" style="width: 100%; border-collapse: collapse; font-family: Raleway, sans-serif;">'
+                            html_table += '<thead><tr>'
+                            for col in top_10.columns:
+                                html_table += f'<th style="background: linear-gradient(to right, #eb4065, #e40032); color: #ffffff; font-size: 18px; font-weight: 700; padding: 15px; text-align: center; border: 1px solid #e40032;">{col}</th>'
+                            html_table += '</tr></thead><tbody>'
+
+                            for idx, row in top_10.iterrows():
+                                bg_color = '#ffffff' if idx % 2 == 0 else '#EEEEEE'
+                                html_table += '<tr>'
+                                for val in row:
+                                    html_table += f'<td style="background: {bg_color}; border: 1px solid #AAAAAA; padding: 10px 15px; text-align: center; font-size: 17px; color: #53575a;">{val}</td>'
+                                html_table += '</tr>'
+
+                            html_table += '</tbody></table>'
+                            st.markdown(html_table, unsafe_allow_html=True)
                         else:
                             st.warning("Unable to geocode ZIP codes. Showing distribution table instead.")
                             # Fallback to table
@@ -424,7 +818,7 @@ if data_loaded:
         st.markdown("---")
 
         # Key metrics statistics
-        st.subheader("📊 Key Soil Metrics Statistics")
+        st.markdown('<h3 style="color: #e40032; font-family: Raleway, sans-serif; font-weight: 600;">📊 Key Soil Metrics Statistics</h3>', unsafe_allow_html=True)
 
         key_metrics = ['1:1 Soil pH', 'Organic Matter', 'CO2-C',
                       'Soil Health Calculation', 'H3A Nitrate']
@@ -446,13 +840,39 @@ if data_loaded:
                     })
 
             stats_df = pd.DataFrame(stats_data)
-            st.dataframe(stats_df, use_container_width=True, height=250)
+
+            # Create HTML table with Regen Ag Lab styling
+            html_table = '<table class="regen-table" style="width: 100%; border-collapse: collapse; margin: 20px 0; font-family: Raleway, sans-serif;">'
+            html_table += '<thead><tr>'
+            for col in stats_df.columns:
+                html_table += f'<th style="background: linear-gradient(to right, #eb4065, #e40032); color: #ffffff; font-size: 18px; font-weight: 700; padding: 15px; text-align: center; border: 1px solid #e40032;">{col}</th>'
+            html_table += '</tr></thead><tbody>'
+
+            for idx, row in stats_df.iterrows():
+                bg_color = '#ffffff' if idx % 2 == 0 else '#EEEEEE'
+                html_table += '<tr>'
+                for val in row:
+                    html_table += f'<td style="background: {bg_color}; border: 1px solid #AAAAAA; padding: 10px 15px; text-align: center; font-size: 17px; color: #53575a; line-height: 1.5;">{val}</td>'
+                html_table += '</tr>'
+
+            html_table += '</tbody></table>'
+            st.markdown(html_table, unsafe_allow_html=True)
 
     # ==================================================================
     # PAGE 2: SOIL HEALTH ANALYSIS
     # ==================================================================
     elif page == "🔬 Soil Health Analysis":
-        st.header("🔬 Soil Health Score Analysis")
+        st.markdown('<h2 class="section-header">🔬 Haney Soil Health Score Analysis</h2>', unsafe_allow_html=True)
+
+        st.markdown("""
+        <div class="info-box">
+        <b>About the Haney Soil Health Score:</b> This integrated metric combines biological activity (24-hr CO2-C respiration)
+        with chemical analysis using the H3A extractant. Unlike traditional testing, the Haney method measures soil as a
+        living ecosystem, providing more accurate plant-available nutrient estimates.
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("---")
 
         health_col = 'Soil Health Calculation' if 'Soil Health Calculation' in data.columns else 'Soil Health Score'
 
@@ -514,7 +934,7 @@ if data_loaded:
                 st.plotly_chart(fig, use_container_width=True)
 
             # Factors analysis
-            st.subheader("🎯 Top Factors Correlated with Soil Health")
+            st.markdown('<h3 style="color: #e40032; font-family: Raleway, sans-serif; font-weight: 600;">🎯 Top Factors Correlated with Soil Health</h3>', unsafe_allow_html=True)
 
             analysis_cols = ['CO2-C', 'Organic Matter', '1:1 Soil pH',
                            'H3A ICAP Potassium', 'H3A ICAP Calcium']
@@ -551,7 +971,7 @@ if data_loaded:
     # PAGE 3: COVER CROP ANALYSIS
     # ==================================================================
     elif page == "🌾 Cover Crop Analysis":
-        st.header("🌾 Cover Crop Mix Analysis")
+        st.markdown('<h2 class="section-header">🌾 Cover Crop Mix Analysis</h2>', unsafe_allow_html=True)
 
         cover_cols = ['Cover Crop Mix', 'Cover crop mix']
         cover_col = None
@@ -622,7 +1042,7 @@ if data_loaded:
     # PAGE 4: ECONOMIC ANALYSIS
     # ==================================================================
     elif page == "💰 Economic Analysis":
-        st.header("💰 Traditional vs Haney Test Economic Analysis")
+        st.markdown('<h2 class="section-header">💰 Traditional vs Haney Test Economic Analysis</h2>', unsafe_allow_html=True)
 
         trad_col = 'Traditional N'
         haney_col = 'Haney Test N'
@@ -720,7 +1140,7 @@ if data_loaded:
     # PAGE 5: CORRELATION EXPLORER
     # ==================================================================
     elif page == "🔗 Correlation Explorer":
-        st.header("🔗 Correlation Explorer")
+        st.markdown('<h2 class="section-header">🔗 Correlation Explorer</h2>', unsafe_allow_html=True)
 
         # Select variables for correlation
         numeric_cols = data.select_dtypes(include=[np.number]).columns.tolist()
@@ -806,7 +1226,7 @@ if data_loaded:
     # PAGE 6: CUSTOM ANALYSIS
     # ==================================================================
     elif page == "📊 Custom Analysis":
-        st.header("📊 Custom Data Analysis")
+        st.markdown('<h2 class="section-header">📊 Custom Data Analysis</h2>', unsafe_allow_html=True)
 
         st.markdown("""
         Explore the dataset with custom filters and visualizations.
@@ -881,11 +1301,23 @@ if data_loaded:
     # PAGE 7: DATA DICTIONARY
     # ==================================================================
     elif page == "📚 Data Dictionary":
-        st.header("📚 Data Dictionary")
+        st.markdown('<h2 class="section-header">📚 Data Dictionary</h2>', unsafe_allow_html=True)
 
         st.markdown("""
         Complete reference for all 211 variables in the dataset, organized by category.
         """)
+
+        st.markdown("""
+        <div class="info-box">
+        <b>Key Haney Test Variables:</b><br>
+        • <b>CO2-C</b> - 24-hour CO2 respiration (measures biological activity)<br>
+        • <b>H3A extractant results</b> - Mimics weak organic acids from plant roots for accurate nutrient availability<br>
+        • <b>WEOC/WEON</b> - Water-extractable organic carbon and nitrogen (food for soil microbes)<br>
+        • <b>Soil Health Calculation</b> - Integrated score combining biology + chemistry
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("---")
 
         # Load data dictionary
         dict_file = BASE_DIR / 'DATA_DICTIONARY.md'
@@ -945,7 +1377,7 @@ if data_loaded:
     # PAGE 8: PROJECT DELIVERABLES
     # ==================================================================
     elif page == "📦 Project Deliverables":
-        st.header("📦 Project Deliverables & File Inventory")
+        st.markdown('<h2 class="section-header">📦 Project Deliverables & File Inventory</h2>', unsafe_allow_html=True)
 
         st.markdown("""
         Complete overview of all analysis outputs, reports, and data files.
@@ -1056,6 +1488,44 @@ if data_loaded:
             - ✅ 11+ statistical tables
             - ✅ Complete data dictionary
             """)
+
+    # Footer (added to all pages) - Regen Ag Lab branding
+    st.markdown("<hr style='border: none; height: 1px; background-color: #dddddd; margin: 30px 0;'>", unsafe_allow_html=True)
+
+    # Convert logo to base64 for embedding
+    import base64
+    try:
+        with open(LOGO_PATH, "rb") as img_file:
+            logo_base64 = base64.b64encode(img_file.read()).decode()
+        logo_html = f'<img src="data:image/png;base64,{logo_base64}" style="width: 150px; height: auto;" alt="Regen Ag Lab Logo">'
+    except:
+        logo_html = ""
+
+    # Footer with embedded logo
+    st.markdown(f"""
+    <div style="background-color: #ffffff; border-top: 4px solid #e40032; padding: 40px 20px; margin-top: 40px;">
+        <div style="display: grid; grid-template-columns: 180px 1fr 180px; gap: 30px; max-width: 1240px; margin: 0 auto; align-items: start;">
+            <div style="text-align: left;">
+                {logo_html}
+            </div>
+            <div style="text-align: center;">
+                <h3 style="color: #53575a; margin-top: 0; font-family: 'Raleway', sans-serif; font-size: 30px; font-weight: 600;">
+                    Powered by Regen Ag Lab
+                </h3>
+                <p style="margin: 15px 0; color: #53575a; font-family: 'Raleway', sans-serif; font-size: 17px;">
+                    <strong>Dr. Rick Haney, Chief Scientific Officer</strong><br>
+                    Measuring soil as a living system
+                </p>
+                <p style="margin: 15px 0; font-size: 17px; color: #53575a; font-family: 'Raleway', sans-serif;">
+                    Visit <a href="https://regenaglab.com/" target="_blank" style="color: #e40032; text-decoration: none; font-weight: 400;">regenaglab.com</a> to learn more about our
+                    comprehensive soil testing services and regenerative agriculture solutions.
+                </p>
+            </div>
+            <div style="text-align: right;">
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 else:
     st.error("Unable to load data. Please check that the data file exists.")
