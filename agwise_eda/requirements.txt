@@ -21,6 +21,7 @@ tzdata==2025.2
 # Dashboard and interactive visualization
 streamlit>=1.28.0
 plotly>=5.18.0
+streamlit-option-menu>=0.3.6
 
 # Geographic data (requires compatible SQLAlchemy version)
 uszipcode>=1.0.1,<2.0
