@@ -403,7 +403,7 @@ st.markdown("""
                 </div>
             </li>
             <li class="nav-item"><a href="Economic_Analysis" target="_parent" class="nav-link">Economic Analysis</a></li>
-            <li class="nav-item"><a href="../?view=feedback" target="_parent" class="nav-link">Feedback</a></li>
+            <li class="nav-item"><a href="Feedback" target="_parent" class="nav-link">Feedback</a></li>
         </ul>
     </div>
 </div>
@@ -639,23 +639,6 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns([1, 2, 1])
 
-with col2:
-    st.markdown("""
-    <div style="text-align: center;">
-        <h3 style="color: #2c5f2d;">Ready to Explore the Data?</h3>
-        <p style="color: #666; font-size: 1.1rem;">Use the sidebar to navigate between analysis tools and pages</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("""
-<div style="background-color: #e8f5e9; padding: 1.5rem; border-radius: 0.5rem; margin-top: 1rem; text-align: center;">
-<h4 style="color: #2c5f2d; margin-top: 0;">👈 Navigate Using the Sidebar</h4>
-<p>Select from the available analysis views in the sidebar to explore different aspects of the soil health data.</p>
-<p style="margin-bottom: 0;"><b>Main Dashboard</b> provides overview statistics and core analysis tools.<br>
-<b>Economic Analysis</b> offers ROI calculations and what-if scenarios.</p>
-</div>
-""", unsafe_allow_html=True)
-
 # How to Use Section
 st.markdown("---")
 st.markdown("## 📖 How to Use This Dashboard")
@@ -667,16 +650,15 @@ with col1:
     ### Getting Started
 
     1. **Launch the Dashboard**: Use the command above to start the Streamlit application
-    2. **Select Analysis View**: Use the sidebar radio buttons to navigate between different analysis pages
-    3. **Apply Filters**: Many pages include interactive filters and controls in the sidebar
-    4. **Interact with Charts**: Hover over visualizations to see detailed data points, zoom, and pan
-    5. **Download Data**: Export charts and analysis results where available
+    2. **Select Analysis View**: Use the navbar links to navigate between different analysis pages
+    3. **Interact with Charts**: Hover over visualizations to see detailed data points, zoom, and pan
+    4. **Download Data**: Export charts and analysis results where available
 
     ### Key Tips
 
     - **Dataset Size**: Working with {:,} samples - some visualizations may be sampled for performance
     - **Missing Data**: Not all samples have complete data for every variable
-    - **Feedback System**: Use the sidebar feedback form to report issues or suggest features
+    - **Feedback System**: Use the feedback form to report issues or suggest features
     """.format(n_samples))
 
 with col2:
