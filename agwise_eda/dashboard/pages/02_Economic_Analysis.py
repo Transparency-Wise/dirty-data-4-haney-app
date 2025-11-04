@@ -328,21 +328,14 @@ st.markdown("""
 # Navigation Bar with dropdown - Deployment Ready (Hybrid approach)
 st.markdown("""
 <style>
-    /* Navigation bar container - full width */
+    /* Navigation bar container */
     [data-testid="stHorizontalBlock"]:first-of-type {
         background-color: #ffffff;
         border-bottom: 3px solid #e40032;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        padding: 0 max(20px, calc((100vw - 1200px) / 2));
+        padding: 0 20px;
         margin-top: 0;
         margin-bottom: 20px;
-        margin-left: calc(-1 * max(0rem, (100% - 1200px) / 2));
-        margin-right: calc(-1 * max(0rem, (100% - 1200px) / 2));
-        width: 100vw;
-        position: relative;
-        left: 50%;
-        right: 50%;
-        transform: translateX(-50%);
     }
 
     /* Style columns in navbar to be inline */
