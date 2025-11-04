@@ -654,7 +654,7 @@ if data_loaded:
                     </div>
                 </li>
                 <li class="nav-item"><a href="Economic_Analysis" target="_parent" class="nav-link">Economic Analysis</a></li>
-                <li class="nav-item"><a href="?view=feedback" target="_parent" class="nav-link">Feedback</a></li>
+                <li class="nav-item"><a href="Feedback" target="_parent" class="nav-link">Feedback</a></li>
             </ul>
         </div>
     </div>
@@ -673,8 +673,7 @@ if data_loaded:
         "correlation": "🔗 Correlation Explorer",
         "custom": "📊 Custom Analysis",
         "dictionary": "📚 Data Dictionary",
-        "deliverables": "📦 Project Deliverables",
-        "feedback": "💬 Feedback"
+        "deliverables": "📦 Project Deliverables"
     }
 
     page = view_mapping.get(view, "📈 Overview & Statistics")
@@ -700,73 +699,6 @@ if data_loaded:
     {n_batches} batches | Interactive analysis powered by Haney Test data
     </div>
     """, unsafe_allow_html=True)
-
-    # Handle feedback page separately
-    if page == "💬 Feedback":
-        st.markdown('<h2 class="section-header">💬 Submit Feedback</h2>', unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="info-box">
-        <b>We'd Love to Hear From You!</b><br>
-        Have a question, comment, bug report, or feature request? Please share your feedback below.
-        </div>
-        """, unsafe_allow_html=True)
-
-        col1, col2 = st.columns([2, 1])
-
-        with col1:
-            feedback_type = st.selectbox(
-                "Feedback Type:",
-                ["Question", "Comment", "Bug Report", "Feature Request", "Data Issue", "Other"],
-                key="feedback_type"
-            )
-
-            feedback_message = st.text_area(
-                "Your Message:",
-                placeholder="Describe your feedback here...",
-                height=200,
-                key="feedback_message"
-            )
-
-            uploaded_file = st.file_uploader(
-                "Attach a file (optional):",
-                type=['png', 'jpg', 'jpeg', 'pdf', 'csv', 'xlsx', 'txt', 'docx'],
-                key="feedback_file"
-            )
-
-            if st.button("📤 Submit Feedback", key="submit_feedback", type="primary"):
-                if feedback_message.strip():
-                    try:
-                        save_feedback(
-                            page="Feedback Page",
-                            feedback_type=feedback_type,
-                            message=feedback_message,
-                            uploaded_file=uploaded_file
-                        )
-                        st.success("✅ Feedback submitted successfully! Thank you!")
-                        st.balloons()
-                    except Exception as e:
-                        st.error(f"❌ Error submitting feedback: {e}")
-                else:
-                    st.warning("⚠️ Please enter a message before submitting.")
-
-        with col2:
-            st.markdown("""
-            <div class="info-box">
-            <h4 style="color: #e40032; margin-top: 0;">About the Haney Soil Health Test</h4>
-            <p>This dashboard analyzes soil samples using the Haney Test methodology developed by Dr. Rick Haney at Regen Ag Lab.</p>
-            <p><b>What Makes It Different:</b></p>
-            <ul style="margin: 0; padding-left: 20px;">
-                <li>Measures soil as a <b>living system</b> (CO2-C respiration)</li>
-                <li>Uses H3A extractant that mimics plant root exudates</li>
-                <li>Integrates biology + chemistry for accurate nutrient availability</li>
-                <li>Supports reduced synthetic fertilizer inputs</li>
-            </ul>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # Stop here - don't render other pages
-        st.stop()
 
     # ==================================================================
     # PAGE 1: OVERVIEW & STATISTICS
@@ -933,6 +865,7 @@ if data_loaded:
                                 )
                             )
 
+                            fig = apply_regen_style(fig)
                             st.plotly_chart(fig, use_container_width=True)
 
                             # Show top 10 locations
@@ -983,6 +916,7 @@ if data_loaded:
                         height=500
                     )
                     fig.update_xaxes(tickangle=45)
+                    fig = apply_regen_style(fig)
                     st.plotly_chart(fig, use_container_width=True)
 
                     st.dataframe(zip_counts.head(20), use_container_width=True)
@@ -1090,6 +1024,7 @@ if data_loaded:
                     yaxis_title="Frequency",
                     height=500
                 )
+                fig = apply_regen_style(fig)
                 st.plotly_chart(fig, use_container_width=True)
 
             with col2:
@@ -1105,6 +1040,7 @@ if data_loaded:
                           marker_colors=['#d32f2f', '#ff9800', '#ffc107', '#4caf50'])
                 ])
                 fig.update_layout(height=400, title="Health Categories")
+                fig = apply_regen_style(fig)
                 st.plotly_chart(fig, use_container_width=True)
 
             # Factors analysis
@@ -1137,6 +1073,7 @@ if data_loaded:
                         yaxis_title="Correlation Coefficient",
                         height=400
                     )
+                    fig = apply_regen_style(fig)
                     st.plotly_chart(fig, use_container_width=True)
         else:
             st.warning("Soil Health Score data not available in dataset.")
@@ -1172,6 +1109,7 @@ if data_loaded:
                 height=500
             )
             fig.update_xaxes(tickangle=45)
+            fig = apply_regen_style(fig)
             st.plotly_chart(fig, use_container_width=True)
 
             # Health by cover crop
@@ -1200,6 +1138,7 @@ if data_loaded:
                         showlegend=False
                     )
                     fig.update_xaxes(tickangle=45)
+                    fig = apply_regen_style(fig)
                     st.plotly_chart(fig, use_container_width=True)
 
                     # Summary statistics
@@ -1208,7 +1147,27 @@ if data_loaded:
                     ]).round(2).sort_values('mean', ascending=False)
 
                     st.subheader("📈 Summary Statistics by Cover Crop")
-                    st.dataframe(summary, use_container_width=True)
+
+                    # Convert summary to dataframe with proper formatting
+                    summary_df = summary.reset_index()
+                    summary_df.columns = ['Cover Crop Mix', 'Count', 'Mean', 'Median', 'Std Dev', 'Min', 'Max']
+
+                    # Create HTML table with Regen Ag Lab styling
+                    html_table = '<table class="regen-table" style="width: 100%; border-collapse: collapse; margin: 20px 0; font-family: Raleway, sans-serif;">'
+                    html_table += '<thead><tr>'
+                    for col in summary_df.columns:
+                        html_table += f'<th style="background: linear-gradient(to right, #eb4065, #e40032); color: #ffffff; font-size: 18px; font-weight: 700; padding: 15px; text-align: center; border: 1px solid #e40032;">{col}</th>'
+                    html_table += '</tr></thead><tbody>'
+
+                    for idx, row in summary_df.iterrows():
+                        bg_color = '#ffffff' if idx % 2 == 0 else '#EEEEEE'
+                        html_table += '<tr>'
+                        for val in row:
+                            html_table += f'<td style="background: {bg_color}; border: 1px solid #AAAAAA; padding: 10px 15px; text-align: center; font-size: 17px; color: #53575a; line-height: 1.5;">{val}</td>'
+                        html_table += '</tr>'
+
+                    html_table += '</tbody></table>'
+                    st.markdown(html_table, unsafe_allow_html=True)
         else:
             st.warning("Cover Crop Mix data not available in dataset.")
 
@@ -1275,6 +1234,7 @@ if data_loaded:
                         yaxis_title=f"{haney_col} (lbs/A)",
                         height=500
                     )
+                    fig = apply_regen_style(fig)
                     st.plotly_chart(fig, use_container_width=True)
 
                 with col2:
@@ -1290,6 +1250,7 @@ if data_loaded:
                         yaxis_title="N Recommendation (lbs/A)",
                         height=500
                     )
+                    fig = apply_regen_style(fig)
                     st.plotly_chart(fig, use_container_width=True)
 
                 # Economic impact
@@ -1394,6 +1355,7 @@ if data_loaded:
                     yaxis_title=var2,
                     height=600
                 )
+                fig = apply_regen_style(fig)
                 st.plotly_chart(fig, use_container_width=True)
 
     # ==================================================================
@@ -1458,6 +1420,7 @@ if data_loaded:
                 xaxis_title=selected_var if viz_type == "Histogram" else "",
                 height=500
             )
+            fig = apply_regen_style(fig)
             st.plotly_chart(fig, use_container_width=True)
 
             # Percentiles
@@ -1469,7 +1432,23 @@ if data_loaded:
                 'Percentile': [f"{p}th" for p in percentiles],
                 'Value': [f"{v:.2f}" for v in percentile_vals]
             })
-            st.dataframe(perc_df, use_container_width=True)
+
+            # Create HTML table with Regen Ag Lab styling
+            html_table = '<table class="regen-table" style="width: 100%; border-collapse: collapse; margin: 20px 0; font-family: Raleway, sans-serif;">'
+            html_table += '<thead><tr>'
+            for col in perc_df.columns:
+                html_table += f'<th style="background: linear-gradient(to right, #eb4065, #e40032); color: #ffffff; font-size: 18px; font-weight: 700; padding: 15px; text-align: center; border: 1px solid #e40032;">{col}</th>'
+            html_table += '</tr></thead><tbody>'
+
+            for idx, row in perc_df.iterrows():
+                bg_color = '#ffffff' if idx % 2 == 0 else '#EEEEEE'
+                html_table += '<tr>'
+                for val in row:
+                    html_table += f'<td style="background: {bg_color}; border: 1px solid #AAAAAA; padding: 10px 15px; text-align: center; font-size: 17px; color: #53575a; line-height: 1.5;">{val}</td>'
+                html_table += '</tr>'
+
+            html_table += '</tbody></table>'
+            st.markdown(html_table, unsafe_allow_html=True)
 
     # ==================================================================
     # PAGE 7: DATA DICTIONARY
@@ -1571,9 +1550,9 @@ if data_loaded:
         st.markdown("---")
 
         # Load and display analysis summary
-        summary_file = BASE_DIR / 'ANALYSIS_SUMMARY_ALL_BATCHES.md'
+        summary_file = BASE_DIR.parent / 'docs' / 'ANALYSIS_SUMMARY_ALL_BATCHES.md'
         try:
-            with open(summary_file, 'r') as f:
+            with open(summary_file, 'r', encoding='utf-8') as f:
                 summary_content = f.read()
 
             st.markdown(summary_content)
