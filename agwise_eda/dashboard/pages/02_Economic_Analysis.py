@@ -284,6 +284,53 @@ st.markdown("""
         font-size: 12px;
         margin-left: 5px;
     }
+
+    /* Expander styling - fix white-on-white issue */
+    /* Target multiple versions of Streamlit expander classes */
+    .streamlit-expanderHeader,
+    [data-testid="stExpander"] summary,
+    details summary,
+    [data-testid="stExpanderDetails"] summary {
+        background-color: #f5f5f5 !important;
+        color: #53575a !important;
+        font-weight: 600 !important;
+        border: 1px solid #eaeaea !important;
+        border-radius: 5px !important;
+        padding: 15px !important;
+        font-family: 'Raleway', sans-serif !important;
+        font-size: 17px !important;
+    }
+
+    .streamlit-expanderHeader:hover,
+    [data-testid="stExpander"] summary:hover,
+    details summary:hover,
+    [data-testid="stExpanderDetails"] summary:hover {
+        background-color: #ffffff !important;
+        border-color: #e40032 !important;
+    }
+
+    .streamlit-expanderContent,
+    [data-testid="stExpander"] [data-testid="stExpanderDetails"],
+    details[open] {
+        background-color: #ffffff !important;
+        border: 1px solid #eaeaea !important;
+        border-top: none !important;
+        padding: 20px !important;
+    }
+
+    /* Ensure expander text is visible */
+    [data-testid="stExpander"] p,
+    [data-testid="stExpander"] span,
+    details summary p,
+    details summary span {
+        color: #53575a !important;
+    }
+
+    /* Expander icon/arrow */
+    [data-testid="stExpander"] svg,
+    details summary svg {
+        color: #53575a !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -308,23 +355,48 @@ st.markdown("""
                 </div>
             </li>
             <li class="nav-item"><a href="Economic_Analysis" target="_parent" class="nav-link active">Economic Analysis</a></li>
-            <li class="nav-item"><a href="../?view=feedback" target="_parent" class="nav-link">Feedback</a></li>
+            <li class="nav-item"><a href="Feedback" target="_parent" class="nav-link">Feedback</a></li>
         </ul>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Header - Regen Ag Lab brand styling
-st.markdown("""
-<div style="text-align: center; padding: 2rem 1rem 1rem 1rem;">
-    <h1 style="color: #e40032; margin: 0; font-size: 48px; font-weight: 600; font-family: 'Raleway', sans-serif;">
-        Haney Soil AI
-    </h1>
-    <p style="color: #53575a; margin: 0.5rem 0 0 0; font-size: 17px; font-family: 'Raleway', sans-serif;">
-        Economic Analysis & ROI Calculator
-    </p>
-</div>
-""", unsafe_allow_html=True)
+# Apply Regen Ag Lab styling to Plotly figures
+def apply_regen_style(fig):
+    """Apply consistent Regen Ag Lab brand styling to Plotly figures"""
+    fig.update_layout(
+        plot_bgcolor='#f5f5f5',
+        paper_bgcolor='#f5f5f5',
+        font=dict(
+            family='Raleway, sans-serif',
+            size=14,
+            color='#53575a'
+        ),
+        title_font=dict(
+            family='Raleway, sans-serif',
+            size=18,
+            color='#53575a',
+            weight=600
+        ),
+        hoverlabel=dict(
+            bgcolor='#ffffff',
+            font_size=14,
+            font_family='Raleway, sans-serif'
+        )
+    )
+
+    # Update axes styling
+    fig.update_xaxes(
+        gridcolor='#dddddd',
+        tickfont=dict(color='#53575a', family='Raleway, sans-serif')
+    )
+    fig.update_yaxes(
+        gridcolor='#dddddd',
+        tickfont=dict(color='#53575a', family='Raleway, sans-serif')
+    )
+
+    return fig
+
 
 st.markdown('<h2 class="section-header">💰 Economic Analysis: Soil Testing ROI</h2>', unsafe_allow_html=True)
 st.markdown("### Interactive What-If Simulation for Haney vs Traditional Testing")
@@ -348,9 +420,17 @@ def load_data():
 
 try:
     df = load_data()
-    st.success(f"✓ Loaded {len(df):,} soil samples for analysis")
+    st.markdown(f'''
+    <div style="background-color: #f5f5f5; border-left: 4px solid #e40032; padding: 15px; margin: 15px 0; font-family: Raleway, sans-serif;">
+        <p style="color: #53575a; margin: 0; font-size: 17px;">✓ Loaded {len(df):,} soil samples for analysis</p>
+    </div>
+    ''', unsafe_allow_html=True)
 except:
-    st.error("Could not load data. Using synthetic data for demonstration.")
+    st.markdown('''
+    <div style="background-color: #f5f5f5; border-left: 4px solid #e40032; padding: 15px; margin: 15px 0; font-family: Raleway, sans-serif;">
+        <p style="color: #e40032; margin: 0; font-size: 17px; font-weight: 600;">⚠ Could not load data. Using synthetic data for demonstration.</p>
+    </div>
+    ''', unsafe_allow_html=True)
     df = pd.DataFrame({
         'Traditional N Rec': np.random.normal(27, 15, 1000),
         'Available N (Haney)': np.random.normal(60, 35, 1000)
@@ -750,6 +830,7 @@ fig_waterfall.update_layout(
     height = 500
 )
 
+fig_waterfall = apply_regen_style(fig_waterfall)
 st.plotly_chart(fig_waterfall, use_container_width=True)
 
 # Visualization 2: Sensitivity Analysis
@@ -835,6 +916,7 @@ fig_sensitivity.update_layout(
     hovermode='x unified'
 )
 
+fig_sensitivity = apply_regen_style(fig_sensitivity)
 st.plotly_chart(fig_sensitivity, use_container_width=True)
 
 # Visualization 3: Multi-variable scenario matrix
@@ -872,6 +954,7 @@ fig_heatmap.update_layout(
     height=500
 )
 
+fig_heatmap = apply_regen_style(fig_heatmap)
 st.plotly_chart(fig_heatmap, use_container_width=True)
 
 # ============================================================================
@@ -882,45 +965,54 @@ st.markdown("---")
 st.markdown("## 🎯 Recommendations & Decision Framework")
 
 if net_benefit_per_acre > 5:
-    st.success(f"""
-    ### ✅ Strong Economic Case for Haney Testing
-
-    **Net benefit of ${net_benefit_per_acre:.2f}/acre justifies the additional testing investment.**
-
-    **Key Drivers:**
-    - Nitrogen savings: ${fertilizer_savings_per_acre:.2f}/acre
-    - Break-even at {breakeven_acres:.1f} acres (you have {acres_per_field} acres)
-    - ROI: {roi_1_year:.1f}% in first year
-
-    **Recommended Action:** Adopt Haney testing for improved N management precision.
-    """)
+    st.markdown(f"""<div style="background-color: #f5f5f5; border-left: 4px solid #e40032; padding: 20px; margin: 20px 0; font-family: Raleway, sans-serif; border-radius: 5px;">
+<h3 style="color: #e40032; margin-top: 0; font-size: 24px; font-weight: 600;">✅ Strong Economic Case for Haney Testing</h3>
+<p style="color: #53575a; font-size: 17px; margin: 15px 0; line-height: 1.7;">
+<strong>Net benefit of ${net_benefit_per_acre:.2f}/acre justifies the additional testing investment.</strong>
+</p>
+<p style="color: #53575a; font-size: 17px; margin: 10px 0; font-weight: 600;">Key Drivers:</p>
+<ul style="color: #53575a; font-size: 17px; line-height: 1.7; margin: 10px 0;">
+<li>Nitrogen savings: ${fertilizer_savings_per_acre:.2f}/acre</li>
+<li>Break-even at {breakeven_acres:.1f} acres (you have {acres_per_field} acres)</li>
+<li>ROI: {roi_1_year:.1f}% in first year</li>
+</ul>
+<p style="color: #53575a; font-size: 17px; margin: 15px 0; line-height: 1.7;">
+<strong>Recommended Action:</strong> Adopt Haney testing for improved N management precision.
+</p>
+</div>""", unsafe_allow_html=True)
 elif net_benefit_per_acre > 0:
-    st.info(f"""
-    ### ⚖️ Marginal Economic Case
-
-    **Net benefit of ${net_benefit_per_acre:.2f}/acre is positive but modest.**
-
-    **Considerations:**
-    - May become more attractive with larger field sizes or higher N prices
-    - Environmental benefits provide additional non-quantified value
-    - Consider for high-value fields or problematic soils first
-
-    **Recommended Action:** Pilot on select fields, evaluate results.
-    """)
+    st.markdown(f"""<div style="background-color: #f5f5f5; border-left: 4px solid #53575a; padding: 20px; margin: 20px 0; font-family: Raleway, sans-serif; border-radius: 5px;">
+<h3 style="color: #53575a; margin-top: 0; font-size: 24px; font-weight: 600;">⚖️ Marginal Economic Case</h3>
+<p style="color: #53575a; font-size: 17px; margin: 15px 0; line-height: 1.7;">
+<strong>Net benefit of ${net_benefit_per_acre:.2f}/acre is positive but modest.</strong>
+</p>
+<p style="color: #53575a; font-size: 17px; margin: 10px 0; font-weight: 600;">Considerations:</p>
+<ul style="color: #53575a; font-size: 17px; line-height: 1.7; margin: 10px 0;">
+<li>May become more attractive with larger field sizes or higher N prices</li>
+<li>Environmental benefits provide additional non-quantified value</li>
+<li>Consider for high-value fields or problematic soils first</li>
+</ul>
+<p style="color: #53575a; font-size: 17px; margin: 15px 0; line-height: 1.7;">
+<strong>Recommended Action:</strong> Pilot on select fields, evaluate results.
+</p>
+</div>""", unsafe_allow_html=True)
 else:
-    st.warning(f"""
-    ### ⚠️ Economics Currently Unfavorable
-
-    **Net benefit of ${net_benefit_per_acre:.2f}/acre suggests traditional testing is more economical under current assumptions.**
-
-    **Factors that could change the analysis:**
-    - Larger field sizes (break-even: {breakeven_acres:.1f} acres)
-    - Higher nitrogen prices
-    - More samples per field (reducing per-acre test cost)
-    - Different crop with higher N response
-
-    **Recommended Action:** Re-evaluate if conditions change.
-    """)
+    st.markdown(f"""<div style="background-color: #f5f5f5; border-left: 4px solid #e40032; padding: 20px; margin: 20px 0; font-family: Raleway, sans-serif; border-radius: 5px;">
+<h3 style="color: #e40032; margin-top: 0; font-size: 24px; font-weight: 600;">⚠️ Economics Currently Unfavorable</h3>
+<p style="color: #53575a; font-size: 17px; margin: 15px 0; line-height: 1.7;">
+<strong>Net benefit of ${net_benefit_per_acre:.2f}/acre suggests traditional testing is more economical under current assumptions.</strong>
+</p>
+<p style="color: #53575a; font-size: 17px; margin: 10px 0; font-weight: 600;">Factors that could change the analysis:</p>
+<ul style="color: #53575a; font-size: 17px; line-height: 1.7; margin: 10px 0;">
+<li>Larger field sizes (break-even: {breakeven_acres:.1f} acres)</li>
+<li>Higher nitrogen prices</li>
+<li>More samples per field (reducing per-acre test cost)</li>
+<li>Different crop with higher N response</li>
+</ul>
+<p style="color: #53575a; font-size: 17px; margin: 15px 0; line-height: 1.7;">
+<strong>Recommended Action:</strong> Re-evaluate if conditions change.
+</p>
+</div>""", unsafe_allow_html=True)
 
 # Additional insights
 with st.expander("📚 Additional Considerations"):
