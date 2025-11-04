@@ -107,14 +107,6 @@ st.markdown("""
         display: none !important;
     }
 
-    header[data-testid="stHeader"] {
-        display: none !important;
-    }
-
-    .stApp > header {
-        display: none !important;
-    }
-
     .main {
         margin-left: 0 !important;
     }
@@ -232,32 +224,123 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Navigation Bar
+# Navigation Bar with dropdown - Deployment Ready (Hybrid approach)
 st.markdown("""
-<div class="top-nav">
-    <div class="nav-container">
-        <div class="nav-logo">Haney Soil AI</div>
-        <ul class="nav-menu">
-            <li class="nav-item"><a href="../" target="_parent" class="nav-link">Home</a></li>
-            <li class="nav-item dropdown">
-                <span class="nav-link">Analysis <span class="dropdown-arrow">▼</span></span>
-                <div class="dropdown-content">
-                    <a href="../" target="_parent">📈 Overview & Statistics</a>
-                    <a href="../?view=soil_health" target="_parent">🔬 Soil Health Analysis</a>
-                    <a href="../?view=cover_crop" target="_parent">🌾 Cover Crop Analysis</a>
-                    <a href="../?view=economic" target="_parent">💰 Economic Analysis</a>
-                    <a href="../?view=correlation" target="_parent">🔗 Correlation Explorer</a>
-                    <a href="../?view=custom" target="_parent">📊 Custom Analysis</a>
-                    <a href="../?view=dictionary" target="_parent">📚 Data Dictionary</a>
-                    <a href="../?view=deliverables" target="_parent">📦 Project Deliverables</a>
-                </div>
-            </li>
-            <li class="nav-item"><a href="Economic_Analysis" target="_parent" class="nav-link">Economic Analysis</a></li>
-            <li class="nav-item"><a href="Feedback" target="_parent" class="nav-link active">Feedback</a></li>
-        </ul>
-    </div>
-</div>
+<style>
+    /* Navigation bar container - full width */
+    [data-testid="stHorizontalBlock"]:first-of-type {
+        background-color: #ffffff;
+        border-bottom: 3px solid #e40032;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 0 max(20px, calc((100vw - 1200px) / 2));
+        margin-top: 0;
+        margin-bottom: 20px;
+        margin-left: calc(-1 * max(0rem, (100% - 1200px) / 2));
+        margin-right: calc(-1 * max(0rem, (100% - 1200px) / 2));
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        transform: translateX(-50%);
+    }
+
+    /* Style columns in navbar to be inline */
+    [data-testid="stHorizontalBlock"]:first-of-type [data-testid="column"] {
+        padding: 0 !important;
+    }
+
+    /* Logo styling */
+    .nav-logo {
+        font-size: 24px;
+        font-weight: 700;
+        color: #e40032;
+        padding: 15px 0;
+        font-family: 'Raleway', sans-serif;
+    }
+
+    /* Style Streamlit page_link buttons to match navbar */
+    [data-testid="stHorizontalBlock"]:first-of-type .stButton > button {
+        background-color: transparent !important;
+        background-image: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+        color: #53575a !important;
+        font-weight: 500 !important;
+        font-family: 'Raleway', sans-serif !important;
+        font-size: 16px !important;
+        padding: 20px 18px !important;
+        transition: all 0.2s ease !important;
+        border-radius: 0 !important;
+        height: auto !important;
+        line-height: normal !important;
+        margin: 0 !important;
+        text-decoration: none !important;
+        cursor: pointer !important;
+        display: block !important;
+        min-height: 0 !important;
+    }
+
+    [data-testid="stHorizontalBlock"]:first-of-type .stButton > button:hover {
+        background-color: #f5f5f5 !important;
+        background-image: none !important;
+        color: #e40032 !important;
+        box-shadow: none !important;
+        text-decoration: none !important;
+    }
+
+    [data-testid="stHorizontalBlock"]:first-of-type .stButton > button:focus {
+        background-color: transparent !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
+    [data-testid="stHorizontalBlock"]:first-of-type .stButton > button:active {
+        background-color: #f5f5f5 !important;
+        box-shadow: none !important;
+    }
+
+    [data-testid="stHorizontalBlock"]:first-of-type .stButton {
+        display: inline-block !important;
+        margin: 0 !important;
+    }
+</style>
 """, unsafe_allow_html=True)
+
+# Navigation using columns - this becomes the sticky header
+nav_cols = st.columns([0.8, 0.5, 0.8, 0.7, 0.6])
+
+with nav_cols[0]:
+    st.markdown('<div class="nav-logo">Haney Soil AI</div>', unsafe_allow_html=True)
+
+with nav_cols[1]:
+    st.markdown('<a href="/01_Home" target="_self" class="nav-link" style="text-decoration: none;">Home</a>', unsafe_allow_html=True)
+
+with nav_cols[2]:
+    # Analysis dropdown (HTML only - uses query params)
+    st.markdown("""
+    <div style="position: relative; display: inline-block;">
+        <div class="nav-item dropdown">
+            <span class="nav-link">Analysis <span class="dropdown-arrow">▼</span></span>
+            <div class="dropdown-content">
+                <a href="/?view=overview" target="_self">📈 Overview & Statistics</a>
+                <a href="/?view=soil_health" target="_self">🔬 Soil Health Analysis</a>
+                <a href="/?view=cover_crop" target="_self">🌾 Cover Crop Analysis</a>
+                <a href="/?view=economic" target="_self">💰 Economic Analysis</a>
+                <a href="/?view=correlation" target="_self">🔗 Correlation Explorer</a>
+                <a href="/?view=custom" target="_self">📊 Custom Analysis</a>
+                <a href="/?view=dictionary" target="_self">📚 Data Dictionary</a>
+                <a href="/?view=deliverables" target="_self">📦 Project Deliverables</a>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with nav_cols[3]:
+    st.markdown('<a href="/02_Economic_Analysis" target="_self" class="nav-link" style="text-decoration: none;">Economic Analysis</a>', unsafe_allow_html=True)
+
+with nav_cols[4]:
+    st.markdown('<a href="/03_Feedback" target="_self" class="nav-link" style="text-decoration: none;">Feedback</a>', unsafe_allow_html=True)
 
 
 # Feedback system function

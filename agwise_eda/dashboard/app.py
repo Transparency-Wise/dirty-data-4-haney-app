@@ -72,15 +72,6 @@ st.markdown("""
         display: none !important;
     }
 
-    /* Hide Streamlit's default header */
-    header[data-testid="stHeader"] {
-        display: none !important;
-    }
-
-    .stApp > header {
-        display: none !important;
-    }
-
     /* Adjust main content area to use full width */
     .main {
         margin-left: 0 !important;
@@ -513,89 +504,65 @@ except Exception as e:
     data_loaded = False
 
 if data_loaded:
-    # Top Navigation Bar with Dropdown - Must be at the very top
+    # Top Navigation Bar with dropdown - Deployment Ready
     st.markdown("""
     <style>
-        /* Custom top navigation bar */
-        .top-nav {
+        /* Navigation bar container */
+        [data-testid="stHorizontalBlock"]:first-of-type {
             background-color: #ffffff;
             border-bottom: 3px solid #e40032;
-            padding: 0;
-            margin: 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            z-index: 999;
-            font-family: 'Raleway', sans-serif;
-        }
-
-        /* Add padding to main content to account for fixed navbar */
-        .block-container {
-            padding-top: 80px !important;
-        }
-
-        .nav-container {
-            max-width: 1240px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
             padding: 0 20px;
+            margin-top: 0;
+            margin-bottom: 20px;
         }
 
+        /* Style columns in navbar to be inline */
+        [data-testid="stHorizontalBlock"]:first-of-type [data-testid="column"] {
+            padding: 0 !important;
+        }
+
+        /* Logo styling */
         .nav-logo {
             font-size: 24px;
-            font-weight: 600;
+            font-weight: 700;
             color: #e40032;
-            padding: 15px 20px 15px 0;
-            text-decoration: none;
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            flex-grow: 1;
+            padding: 15px 0;
+            font-family: 'Raleway', sans-serif;
         }
 
         .nav-item {
             position: relative;
+            display: inline-block;
         }
 
         .nav-link {
             display: block;
-            padding: 18px 20px;
+            padding: 20px 18px;
             color: #53575a !important;
             text-decoration: none !important;
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 500;
             transition: all 0.2s ease;
+            font-size: 16px;
             cursor: pointer;
         }
 
-        .nav-link:visited {
-            color: #53575a !important;
-            text-decoration: none !important;
-        }
-
         .nav-link:hover {
-            background-color: #f5f5f5;
             color: #e40032 !important;
+            background-color: #f5f5f5;
             text-decoration: none !important;
         }
 
         .nav-link.active {
-            background-color: #e40032;
-            color: #ffffff !important;
+            color: #e40032 !important;
+            border-bottom: 3px solid #e40032;
+            margin-bottom: -3px;
+            text-decoration: none !important;
         }
 
-        /* Dropdown menu */
+        /* Dropdown styling */
         .dropdown {
             position: relative;
-            display: inline-block;
         }
 
         .dropdown-content {
@@ -603,62 +570,120 @@ if data_loaded:
             position: absolute;
             background-color: #ffffff;
             min-width: 250px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             z-index: 1000;
-            border: 1px solid #eaeaea;
             border-top: 3px solid #e40032;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .dropdown-content a {
+            color: #53575a !important;
+            padding: 12px 16px;
+            text-decoration: none !important;
+            display: block;
+            font-size: 15px;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f5f5f5;
+            color: #e40032 !important;
+            padding-left: 25px;
+            text-decoration: none !important;
         }
 
         .dropdown:hover .dropdown-content {
             display: block;
         }
 
-        .dropdown-content a {
-            color: #53575a;
-            padding: 12px 20px;
-            text-decoration: none;
-            display: block;
-            font-size: 15px;
-            font-weight: 400;
-            transition: all 0.2s ease;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #f5f5f5;
-            color: #e40032;
-            padding-left: 25px;
-        }
-
         .dropdown-arrow {
             font-size: 12px;
             margin-left: 5px;
         }
-    </style>
 
-    <div class="top-nav">
-        <div class="nav-container">
-            <div class="nav-logo">Haney Soil AI</div>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="Home" target="_parent" class="nav-link">Home</a></li>
-                <li class="nav-item dropdown">
-                    <span class="nav-link">Analysis <span class="dropdown-arrow">▼</span></span>
-                    <div class="dropdown-content">
-                        <a href="?view=overview" target="_parent">📈 Overview & Statistics</a>
-                        <a href="?view=soil_health" target="_parent">🔬 Soil Health Analysis</a>
-                        <a href="?view=cover_crop" target="_parent">🌾 Cover Crop Analysis</a>
-                        <a href="?view=economic" target="_parent">💰 Economic Analysis</a>
-                        <a href="?view=correlation" target="_parent">🔗 Correlation Explorer</a>
-                        <a href="?view=custom" target="_parent">📊 Custom Analysis</a>
-                        <a href="?view=dictionary" target="_parent">📚 Data Dictionary</a>
-                        <a href="?view=deliverables" target="_parent">📦 Project Deliverables</a>
-                    </div>
-                </li>
-                <li class="nav-item"><a href="Economic_Analysis" target="_parent" class="nav-link">Economic Analysis</a></li>
-                <li class="nav-item"><a href="Feedback" target="_parent" class="nav-link">Feedback</a></li>
-            </ul>
-        </div>
-    </div>
+        /* Style Streamlit page_link buttons to match navbar */
+        [data-testid="stHorizontalBlock"]:first-of-type .stButton > button {
+            background-color: transparent !important;
+            background-image: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            color: #53575a !important;
+            font-weight: 500 !important;
+            font-family: 'Raleway', sans-serif !important;
+            font-size: 16px !important;
+            padding: 20px 18px !important;
+            transition: all 0.2s ease !important;
+            border-radius: 0 !important;
+            height: auto !important;
+            line-height: normal !important;
+            margin: 0 !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+            display: block !important;
+            min-height: 0 !important;
+        }
+
+        [data-testid="stHorizontalBlock"]:first-of-type .stButton > button:hover {
+            background-color: #f5f5f5 !important;
+            background-image: none !important;
+            color: #e40032 !important;
+            box-shadow: none !important;
+            text-decoration: none !important;
+        }
+
+        [data-testid="stHorizontalBlock"]:first-of-type .stButton > button:focus {
+            background-color: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        [data-testid="stHorizontalBlock"]:first-of-type .stButton > button:active {
+            background-color: #f5f5f5 !important;
+            box-shadow: none !important;
+        }
+
+        [data-testid="stHorizontalBlock"]:first-of-type .stButton {
+            display: inline-block !important;
+            margin: 0 !important;
+        }
+    </style>
     """, unsafe_allow_html=True)
+
+    # Navigation using columns - this becomes the sticky header
+    nav_cols = st.columns([0.8, 0.5, 0.8, 0.7, 0.6])
+
+    with nav_cols[0]:
+        st.markdown('<div class="nav-logo">Haney Soil AI</div>', unsafe_allow_html=True)
+
+    with nav_cols[1]:
+        st.markdown('<a href="/01_Home" target="_self" class="nav-link" style="text-decoration: none;">Home</a>', unsafe_allow_html=True)
+
+    with nav_cols[2]:
+        # Analysis dropdown (HTML only - uses query params)
+        st.markdown("""
+        <div style="position: relative; display: inline-block;">
+            <div class="nav-item dropdown">
+                <span class="nav-link">Analysis <span class="dropdown-arrow">▼</span></span>
+                <div class="dropdown-content">
+                    <a href="?view=overview" target="_self">📈 Overview & Statistics</a>
+                    <a href="?view=soil_health" target="_self">🔬 Soil Health Analysis</a>
+                    <a href="?view=cover_crop" target="_self">🌾 Cover Crop Analysis</a>
+                    <a href="?view=economic" target="_self">💰 Economic Analysis</a>
+                    <a href="?view=correlation" target="_self">🔗 Correlation Explorer</a>
+                    <a href="?view=custom" target="_self">📊 Custom Analysis</a>
+                    <a href="?view=dictionary" target="_self">📚 Data Dictionary</a>
+                    <a href="?view=deliverables" target="_self">📦 Project Deliverables</a>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with nav_cols[3]:
+        st.markdown('<a href="/02_Economic_Analysis" target="_self" class="nav-link" style="text-decoration: none;">Economic Analysis</a>', unsafe_allow_html=True)
+
+    with nav_cols[4]:
+        st.markdown('<a href="/03_Feedback" target="_self" class="nav-link" style="text-decoration: none;">Feedback</a>', unsafe_allow_html=True)
 
     # Get query parameters for view selection
     query_params = st.query_params
@@ -1457,44 +1482,107 @@ if data_loaded:
         st.markdown('<h2 class="section-header">📚 Data Dictionary</h2>', unsafe_allow_html=True)
 
         st.markdown("""
-        Complete reference for all 211 variables in the dataset, organized by category.
+        Complete reference for all 211 variables in the dataset, organized by category with enhanced search and filtering capabilities.
         """)
 
-        st.markdown("""
-        <div class="info-box">
-        <b>Key Haney Test Variables:</b><br>
-        • <b>CO2-C</b> - 24-hour CO2 respiration (measures biological activity)<br>
-        • <b>H3A extractant results</b> - Mimics weak organic acids from plant roots for accurate nutrient availability<br>
-        • <b>WEOC/WEON</b> - Water-extractable organic carbon and nitrogen (food for soil microbes)<br>
-        • <b>Soil Health Calculation</b> - Integrated score combining biology + chemistry
-        </div>
-        """, unsafe_allow_html=True)
+        # Quick Reference Section - Key Haney Variables
+        st.markdown("### 🔬 Quick Reference: Essential Haney Test Variables")
+
+        quick_ref_html = """
+        <table class="regen-table" style="width: 100%; border-collapse: collapse; margin: 20px 0; font-family: Raleway, sans-serif;">
+            <thead>
+                <tr>
+                    <th style="background: linear-gradient(to right, #eb4065, #e40032); color: #ffffff; font-size: 16px; font-weight: 700; padding: 12px; text-align: left; border: 1px solid #e40032; width: 20%;">Variable</th>
+                    <th style="background: linear-gradient(to right, #eb4065, #e40032); color: #ffffff; font-size: 16px; font-weight: 700; padding: 12px; text-align: left; border: 1px solid #e40032;">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background-color: #ffffff;">
+                    <td style="padding: 10px; border: 1px solid #eaeaea; font-weight: 600; color: #e40032;">CO2-C</td>
+                    <td style="padding: 10px; border: 1px solid #eaeaea; color: #53575a;">24-hour CO2 respiration - Measures biological activity and microbial health</td>
+                </tr>
+                <tr style="background-color: #f9f9f9;">
+                    <td style="padding: 10px; border: 1px solid #eaeaea; font-weight: 600; color: #e40032;">H3A N/P/K</td>
+                    <td style="padding: 10px; border: 1px solid #eaeaea; color: #53575a;">H3A extractant results - Mimics weak organic acids from plant roots for accurate nutrient availability</td>
+                </tr>
+                <tr style="background-color: #ffffff;">
+                    <td style="padding: 10px; border: 1px solid #eaeaea; font-weight: 600; color: #e40032;">WEOC</td>
+                    <td style="padding: 10px; border: 1px solid #eaeaea; color: #53575a;">Water-Extractable Organic Carbon - Food source for soil microorganisms</td>
+                </tr>
+                <tr style="background-color: #f9f9f9;">
+                    <td style="padding: 10px; border: 1px solid #eaeaea; font-weight: 600; color: #e40032;">WEON</td>
+                    <td style="padding: 10px; border: 1px solid #eaeaea; color: #53575a;">Water-Extractable Organic Nitrogen - Readily available nitrogen for microbes</td>
+                </tr>
+                <tr style="background-color: #ffffff;">
+                    <td style="padding: 10px; border: 1px solid #eaeaea; font-weight: 600; color: #e40032;">Soil Health Calc</td>
+                    <td style="padding: 10px; border: 1px solid #eaeaea; color: #53575a;">Integrated score combining biological activity and chemical nutrient availability</td>
+                </tr>
+                <tr style="background-color: #f9f9f9;">
+                    <td style="padding: 10px; border: 1px solid #eaeaea; font-weight: 600; color: #e40032;">Organic Matter</td>
+                    <td style="padding: 10px; border: 1px solid #eaeaea; color: #53575a;">Total organic matter content - Foundation of soil health and fertility</td>
+                </tr>
+            </tbody>
+        </table>
+        """
+        st.markdown(quick_ref_html, unsafe_allow_html=True)
+
+        st.markdown("---")
+
+        # Summary Stats
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Variables", "211")
+        with col2:
+            st.metric("Numeric Variables", "94")
+        with col3:
+            st.metric("Categorical Variables", "117")
+        with col4:
+            st.metric("Categories", "17")
+
+        st.markdown("---")
+
+        # Enhanced Search and Filter
+        st.markdown("### 🔍 Search & Filter")
+
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            search_term = st.text_input("Search variables by name or keyword:", "", key="dict_search")
+        with col2:
+            show_only_complete = st.checkbox("Show only variables >50% complete", value=False)
+
+        # Category selector
+        categories = [
+            "All Categories",
+            "📋 Identification & Metadata",
+            "🧪 pH & Electrical Conductivity",
+            "🌱 Organic Matter & Carbon",
+            "🔬 Nitrogen (N) Measurements",
+            "💧 Phosphorus (P) Measurements",
+            "⚡ Potassium (K) Measurements",
+            "🧬 Secondary Macronutrients (Ca, Mg, S)",
+            "🔍 Micronutrients (Zn, Fe, Mn, Cu, B)",
+            "💚 Soil Health Metrics",
+            "🦠 Enzyme Activity",
+            "🌾 Nutrient Recommendations",
+            "💰 Economic Calculations",
+            "🌽 Crop Information",
+            "🌿 Cover Crop Data",
+            "⚙️ CEC & Base Saturation",
+            "♻️ Regenerative Metrics",
+            "📊 Internal Tracking"
+        ]
+        selected_category = st.selectbox("Filter by category:", categories, key="dict_category")
 
         st.markdown("---")
 
         # Load data dictionary
         dict_file = BASE_DIR / 'DATA_DICTIONARY.md'
         try:
-            with open(dict_file, 'r') as f:
+            with open(dict_file, 'r', encoding='utf-8') as f:
                 dict_content = f.read()
 
-            # Show summary stats first
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                st.metric("Total Variables", "211")
-            with col2:
-                st.metric("Numeric Variables", "94")
-            with col3:
-                st.metric("Categorical Variables", "117")
-            with col4:
-                st.metric("Categories", "17")
-
-            st.markdown("---")
-
-            # Add search functionality
-            st.subheader("🔍 Search Variables")
-            search_term = st.text_input("Enter variable name or keyword:", "")
-
+            # For now, show the markdown content (will enhance further in next iteration)
+            # This maintains functionality while we build the parser
             if search_term:
                 # Filter dictionary content
                 lines = dict_content.split('\n')
@@ -1505,7 +1593,7 @@ if data_loaded:
                 for line in lines:
                     if search_term.lower() in line.lower():
                         show_context = True
-                        context_lines = 10  # Show 10 lines after match
+                        context_lines = 15  # Show 15 lines after match for better context
 
                     if show_context:
                         filtered_lines.append(line)
@@ -1518,6 +1606,27 @@ if data_loaded:
                     st.markdown('\n'.join(filtered_lines))
                 else:
                     st.warning(f"No variables found matching '{search_term}'")
+            elif selected_category != "All Categories":
+                # Filter by category
+                category_name = selected_category.split(" ", 1)[1] if " " in selected_category else selected_category
+                lines = dict_content.split('\n')
+                in_category = False
+                category_lines = []
+
+                for line in lines:
+                    if f"### {category_name}" in line:
+                        in_category = True
+                        category_lines.append(line)
+                    elif line.startswith("### ") and in_category and f"### {category_name}" not in line:
+                        # Hit next category, stop
+                        break
+                    elif in_category:
+                        category_lines.append(line)
+
+                if category_lines:
+                    st.markdown('\n'.join(category_lines))
+                else:
+                    st.warning(f"Category '{category_name}' not found in data dictionary.")
             else:
                 # Show full dictionary
                 st.markdown(dict_content)
