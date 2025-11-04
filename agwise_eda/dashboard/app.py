@@ -62,19 +62,9 @@ st.markdown("""
         background-color: #f5f5f5 !important;
     }
 
-    /* Hide sidebar completely since we're using top navigation */
+    /* Sidebar styling - allow it to be toggled */
     [data-testid="stSidebar"] {
-        display: none !important;
-    }
-
-    /* Hide sidebar toggle button */
-    button[kind="header"] {
-        display: none !important;
-    }
-
-    /* Adjust main content area to use full width */
-    .main {
-        margin-left: 0 !important;
+        background-color: #ffffff;
     }
 
     html, body, [class*="css"], .stMarkdown {
@@ -504,7 +494,7 @@ except Exception as e:
     data_loaded = False
 
 if data_loaded:
-    # Top Navigation Bar with dropdown - Deployment Ready
+    # Top Navigation Bar - Deployment Ready
     st.markdown("""
     <style>
         /* Navigation bar container */
@@ -512,14 +502,16 @@ if data_loaded:
             background-color: #ffffff;
             border-bottom: 3px solid #e40032;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 0 20px;
+            padding: 10px 20px;
             margin-top: 0;
             margin-bottom: 20px;
         }
 
-        /* Style columns in navbar to be inline */
+        /* Style columns in navbar to be inline and vertically centered */
         [data-testid="stHorizontalBlock"]:first-of-type [data-testid="column"] {
             padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
         }
 
         /* Logo styling */
@@ -529,76 +521,6 @@ if data_loaded:
             color: #e40032;
             padding: 15px 0;
             font-family: 'Raleway', sans-serif;
-        }
-
-        .nav-item {
-            position: relative;
-            display: inline-block;
-        }
-
-        .nav-link {
-            display: block;
-            padding: 20px 18px;
-            color: #53575a !important;
-            text-decoration: none !important;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .nav-link:hover {
-            color: #e40032 !important;
-            background-color: #f5f5f5;
-            text-decoration: none !important;
-        }
-
-        .nav-link.active {
-            color: #e40032 !important;
-            border-bottom: 3px solid #e40032;
-            margin-bottom: -3px;
-            text-decoration: none !important;
-        }
-
-        /* Dropdown styling */
-        .dropdown {
-            position: relative;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #ffffff;
-            min-width: 250px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            z-index: 1000;
-            border-top: 3px solid #e40032;
-            border-radius: 0 0 5px 5px;
-        }
-
-        .dropdown-content a {
-            color: #53575a !important;
-            padding: 12px 16px;
-            text-decoration: none !important;
-            display: block;
-            font-size: 15px;
-            transition: background-color 0.2s ease;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #f5f5f5;
-            color: #e40032 !important;
-            padding-left: 25px;
-            text-decoration: none !important;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        .dropdown-arrow {
-            font-size: 12px;
-            margin-left: 5px;
         }
 
         /* Style Streamlit page_link buttons to match navbar */
@@ -612,7 +534,7 @@ if data_loaded:
             font-weight: 500 !important;
             font-family: 'Raleway', sans-serif !important;
             font-size: 16px !important;
-            padding: 20px 18px !important;
+            padding: 12px 18px !important;
             transition: all 0.2s ease !important;
             border-radius: 0 !important;
             height: auto !important;
@@ -650,58 +572,38 @@ if data_loaded:
     </style>
     """, unsafe_allow_html=True)
 
-    # Navigation using columns - this becomes the sticky header
-    nav_cols = st.columns([0.8, 0.5, 0.8, 0.7, 0.6])
+    # Navigation using columns
+    nav_cols = st.columns([1.0, 0.6, 0.9, 0.8, 0.6])
 
     with nav_cols[0]:
         st.markdown('<div class="nav-logo">Haney Soil AI</div>', unsafe_allow_html=True)
 
     with nav_cols[1]:
-        st.markdown('<a href="/01_Home" target="_self" class="nav-link" style="text-decoration: none;">Home</a>', unsafe_allow_html=True)
+        st.page_link("pages/01_Home.py", label="Home", use_container_width=False)
 
     with nav_cols[2]:
-        # Analysis dropdown (HTML only - uses query params)
-        st.markdown("""
-        <div style="position: relative; display: inline-block;">
-            <div class="nav-item dropdown">
-                <span class="nav-link">Analysis <span class="dropdown-arrow">▼</span></span>
-                <div class="dropdown-content">
-                    <a href="?view=overview" target="_self">📈 Overview & Statistics</a>
-                    <a href="?view=soil_health" target="_self">🔬 Soil Health Analysis</a>
-                    <a href="?view=cover_crop" target="_self">🌾 Cover Crop Analysis</a>
-                    <a href="?view=economic" target="_self">💰 Economic Analysis</a>
-                    <a href="?view=correlation" target="_self">🔗 Correlation Explorer</a>
-                    <a href="?view=custom" target="_self">📊 Custom Analysis</a>
-                    <a href="?view=dictionary" target="_self">📚 Data Dictionary</a>
-                    <a href="?view=deliverables" target="_self">📦 Project Deliverables</a>
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.page_link("app.py", label="Analysis Dashboard", use_container_width=False)
 
     with nav_cols[3]:
-        st.markdown('<a href="/02_Economic_Analysis" target="_self" class="nav-link" style="text-decoration: none;">Economic Analysis</a>', unsafe_allow_html=True)
+        st.page_link("pages/02_Economic_Analysis.py", label="Economic Analysis", use_container_width=False)
 
     with nav_cols[4]:
-        st.markdown('<a href="/03_Feedback" target="_self" class="nav-link" style="text-decoration: none;">Feedback</a>', unsafe_allow_html=True)
+        st.page_link("pages/03_Feedback.py", label="Feedback", use_container_width=False)
 
-    # Get query parameters for view selection
-    query_params = st.query_params
-    view = query_params.get("view", "overview")
-
-    # Map view to page name
-    view_mapping = {
-        "overview": "📈 Overview & Statistics",
-        "soil_health": "🔬 Soil Health Analysis",
-        "cover_crop": "🌾 Cover Crop Analysis",
-        "economic": "💰 Economic Analysis",
-        "correlation": "🔗 Correlation Explorer",
-        "custom": "📊 Custom Analysis",
-        "dictionary": "📚 Data Dictionary",
-        "deliverables": "📦 Project Deliverables"
-    }
-
-    page = view_mapping.get(view, "📈 Overview & Statistics")
+    # Sidebar for Analysis view selection
+    st.sidebar.markdown("## Analysis Views")
+    page = st.sidebar.radio(
+        "Select Analysis:",
+        ["📈 Overview & Statistics",
+         "🔬 Soil Health Analysis",
+         "🌾 Cover Crop Analysis",
+         "💰 Economic Analysis",
+         "🔗 Correlation Explorer",
+         "📊 Custom Analysis",
+         "📚 Data Dictionary",
+         "📦 Project Deliverables"],
+        index=0
+    )
 
     # Header - Regen Ag Lab brand styling
     st.markdown("""

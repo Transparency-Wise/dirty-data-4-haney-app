@@ -8,7 +8,7 @@ import pandas as pd
 import datetime
 from pathlib import Path
 
-st.set_page_config(page_title="Feedback", page_icon="💬", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Feedback", page_icon="💬", layout="wide", initial_sidebar_state="expanded")
 
 # Setup paths
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -98,17 +98,9 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    /* Hide sidebar */
+    /* Sidebar styling - allow it to be toggled */
     [data-testid="stSidebar"] {
-        display: none !important;
-    }
-
-    button[kind="header"] {
-        display: none !important;
-    }
-
-    .main {
-        margin-left: 0 !important;
+        background-color: #ffffff;
     }
 
     /* Top Navigation Bar */
@@ -232,14 +224,16 @@ st.markdown("""
         background-color: #ffffff;
         border-bottom: 3px solid #e40032;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        padding: 0 20px;
+        padding: 10px 20px;
         margin-top: 0;
         margin-bottom: 20px;
     }
 
-    /* Style columns in navbar to be inline */
+    /* Style columns in navbar to be inline and vertically centered */
     [data-testid="stHorizontalBlock"]:first-of-type [data-testid="column"] {
         padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
     }
 
     /* Logo styling */
@@ -262,7 +256,7 @@ st.markdown("""
         font-weight: 500 !important;
         font-family: 'Raleway', sans-serif !important;
         font-size: 16px !important;
-        padding: 20px 18px !important;
+        padding: 12px 18px !important;
         transition: all 0.2s ease !important;
         border-radius: 0 !important;
         height: auto !important;
@@ -301,39 +295,31 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Navigation using columns - this becomes the sticky header
-nav_cols = st.columns([0.8, 0.5, 0.8, 0.7, 0.6])
+nav_cols = st.columns([1.0, 0.6, 0.9, 0.8, 0.6])
 
 with nav_cols[0]:
     st.markdown('<div class="nav-logo">Haney Soil AI</div>', unsafe_allow_html=True)
 
 with nav_cols[1]:
-    st.markdown('<a href="/01_Home" target="_self" class="nav-link" style="text-decoration: none;">Home</a>', unsafe_allow_html=True)
+    st.page_link("pages/01_Home.py", label="Home", use_container_width=False)
 
 with nav_cols[2]:
-    # Analysis dropdown (HTML only - uses query params)
-    st.markdown("""
-    <div style="position: relative; display: inline-block;">
-        <div class="nav-item dropdown">
-            <span class="nav-link">Analysis <span class="dropdown-arrow">▼</span></span>
-            <div class="dropdown-content">
-                <a href="/?view=overview" target="_self">📈 Overview & Statistics</a>
-                <a href="/?view=soil_health" target="_self">🔬 Soil Health Analysis</a>
-                <a href="/?view=cover_crop" target="_self">🌾 Cover Crop Analysis</a>
-                <a href="/?view=economic" target="_self">💰 Economic Analysis</a>
-                <a href="/?view=correlation" target="_self">🔗 Correlation Explorer</a>
-                <a href="/?view=custom" target="_self">📊 Custom Analysis</a>
-                <a href="/?view=dictionary" target="_self">📚 Data Dictionary</a>
-                <a href="/?view=deliverables" target="_self">📦 Project Deliverables</a>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.page_link("app.py", label="Analysis Dashboard", use_container_width=False)
 
 with nav_cols[3]:
-    st.markdown('<a href="/02_Economic_Analysis" target="_self" class="nav-link" style="text-decoration: none;">Economic Analysis</a>', unsafe_allow_html=True)
+    st.page_link("pages/02_Economic_Analysis.py", label="Economic Analysis", use_container_width=False)
 
 with nav_cols[4]:
-    st.markdown('<a href="/03_Feedback" target="_self" class="nav-link" style="text-decoration: none;">Feedback</a>', unsafe_allow_html=True)
+    st.page_link("pages/03_Feedback.py", label="Feedback", use_container_width=False)
+
+# Sidebar navigation
+st.sidebar.markdown("## Navigation")
+st.sidebar.page_link("pages/01_Home.py", label="🏠 Home")
+st.sidebar.page_link("pages/02_Economic_Analysis.py", label="💰 Economic Analysis")
+st.sidebar.page_link("pages/03_Feedback.py", label="💬 Feedback")
+st.sidebar.markdown("---")
+st.sidebar.markdown("## Analysis Dashboard")
+st.sidebar.page_link("app.py", label="📊 View Analysis Dashboard")
 
 
 # Feedback system function
